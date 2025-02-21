@@ -37,30 +37,88 @@ module cpu(
     inout [31:0] dmem_data
 );
     
-    /*----FLAGS----*/
-    reg prog_start;    
+/*--------FLAGS--------*/
+  
     
-    /*----Wire Connections----*/
-    wire imm_sel;
-    wire [31:0] mux_result, rs1_value, rs2_value, alu_result;
+/*--------Wire Connections--------*/
+    wire        imm_sel,
+                write_enable,
+                write_enable_reg;
+    
+    wire [31:0] instruction,
+                instruction_reg,
+                mux_result,
+                mux_result_reg,
+                rs1_value,
+                rs1_value_reg,
+                rs2_value,
+                rs2_value_reg,
+                alu_result,
+                alu_result_reg;
+                
     wire [11:0] imm_value;
-    wire [6:0] funct7, opcode;
-    wire [4:0] rd_sel, rs1_sel, rs2_sel;
-    wire [2:0] funct3;    
     
-    /*----Pipeline Registers----*/
-    reg [31:0] instr_fetch;
+    wire [6:0]  funct7,
+                funct7_reg,
+                opcode,
+                opcode_reg;
+                
+    wire [4:0]  rd_sel,
+                rd_sel_reg,
+                rs1_sel,
+                rs1_sel_reg,
+                rs2_sel,
+                rs2_sel_reg;
+                
+    wire [2:0]  funct3,
+                funct3_reg;    
     
+/*--------Pipeline Registers--------*/
+    pipeline_reg_instruction pri(
+        .clk(clk),
+        .instruction_in(instruction),
+        .instruction_out(instruction_reg)
+    );
     
-    /*----Block Components----*/
+    pipeline_reg_decoder prd(
+        .clk(clk),
+        .write_enable_in(write_enable),
+        .mux_result_in(mux_result),
+        .rs1_value_in(rs1_value),
+        .opcode_in(opcode),
+        .funct7_in(funct7),
+        .rd_sel_in(rd_sel),
+        .funct3_in(funct3),
+        .write_enable_out(write_enable_reg),
+        .mux_result_out(mux_result_reg),
+        .rs1_value_out(rs1_value_reg),
+        .opcode_out(opcode_reg),
+        .funct7_out(funct7_reg),
+        .rd_sel_out(rd_sel_reg),
+        .funct3_out(funct3_reg)               
+    );
+    
+    pipeline_reg_alu pra(
+        .clk(clk),
+        .alu_result_in(alu_result),
+        .alu_result_out(alu_result_reg)
+    );
+    
+/*--------Block Components--------*/
     cc_counter ccc(
         .rst_n(rst_n),
-        .clk(clk)
-        /*----TODO----*/
+        .clk(clk),
+        .cc_count(/*----TODO----*/)
+    );
+    
+    program_counter pc(
+        .clk(clk),
+        .rst_n(rst_n),
+        .program_count(/*----TODO----*/)
     );
     
     decoder dcr(
-        .instruction(instr_fetch),
+        .instruction(instruction_reg),
         .funct3_out(funct3),
         .funct7_out(funct7),
         .rd_sel_out(rd_sel),
@@ -68,7 +126,8 @@ module cpu(
         .rs2_sel_out(rs2_sel),
         .imm_value_out(imm_value),
         .opcode_out(opcode),
-        .imm_sel_out(imm_sel)
+        .imm_sel_out(imm_sel),
+        .write_enable_out(write_enable)
     );
     
     mux_alu mux(
@@ -79,32 +138,23 @@ module cpu(
     );
     
     alu alu(
-        .opcode_in(opcode),
-        .funct3_in(funct3),
-        .funct7_in(funct7),
-        .rs1_in(rs1_value),
-        .mux_result_in(mux_result),
-        .alu_result_out(alu_result)
+        .opcode_in(opcode_reg),
+        .funct3_in(funct3_reg),
+        .funct7_in(funct7_reg),
+        .rs1_in(rs1_value_reg),
+        .mux_result_in(mux_result_reg),
+        .alu_result_out(alu_result_reg)
     );
     
     register_file rgf(
         .clk(clk),
-        .write_enable(/*----TODO----*/),
-        .rd_sel_in(rd_sel),
+        .write_enable_in(write_enable_reg),
+        .rd_sel_in(rd_sel_reg),
         .rs1_sel_in(rs1_sel),
         .rs2_sel_in(rs2_sel),
-        .write_data_in(alu_result),
+        .write_data_in(alu_result_reg),
         .rs1_value_out(rs1_value),
         .rs2_value_out(rs2_value)
     );
-    
-    /*----FETCH----*/
-    always @(posedge clk) begin
-        instr_fetch <= imem_insn;
-    end
-    
-    
-    
-    /*----DECODE----*/
-  
+
 endmodule
