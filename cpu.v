@@ -143,7 +143,7 @@ module cpu(
         .funct7_in(funct7_reg),
         .rs1_in(rs1_value_reg),
         .mux_result_in(mux_result_reg),
-        .alu_result_out(alu_result_reg)
+        .alu_result_out(alu_result)
     );
     
     register_file rgf(
