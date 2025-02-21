@@ -21,7 +21,7 @@
 
 
 module register_file(
-    input clk, write_enable,
+    input clk, write_enable_in,
     input [4:0] rd_sel_in, rs1_sel_in, rs2_sel_in,
     input [31:0] write_data_in,
     output reg [31:0] rs1_value_out, rs2_value_out
@@ -38,9 +38,8 @@ module register_file(
 
     // Synchronous write: Write data on clock edge if enabled
     always @(posedge clk) begin
-        if (write_enable && rd_sel_in != 5'b00000)  // Prevents writing to register 0
+        if (write_enable_in && rd_sel_in != 5'b00000)  // Prevents writing to register 0
             registers[rd_sel_in] <= write_data_in;
     end
 
 endmodule
-
