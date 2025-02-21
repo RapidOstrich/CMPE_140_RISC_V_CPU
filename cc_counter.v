@@ -24,17 +24,16 @@ module cc_counter(
     // Active low reset, Clock, and program start flag
     input rst_n, clk,
 
-    // Start status
-    output reg prog_start,
-
-    // Program count
-    output reg [15:0] pc
-    );
+    // Clock cycle count
+    output reg [15:0] cc_count
+);
+    
+    reg prog_start;
     
     // Start program counter & start flag at 0
     initial begin
-        pc <= 0;
-        prog_start = 0;
+        cc_count <= 0;
+        prog_start <= 0;
     end
     
     always @(posedge clk) begin
@@ -46,7 +45,7 @@ module cc_counter(
     
         // Increment program counter
         if (prog_start) begin
-            pc <= pc + 1; 
+            cc_count <= cc_count + 1; 
         end
     end
     
