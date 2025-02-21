@@ -23,17 +23,21 @@
 module decoder(
 
     input [31:0] instruction,
+    
    /*----Static partition----*/     
-    output reg [6:0] opcode,
+    output reg [6:0] opcode_out,
+    
    /*----Dynamic partition----*/
-    output reg [4:0] rd,
-    output reg [2:0] funct3,
-    output reg [4:0] rs1, rs2,
-    output reg [6:0] funct7,
+    output reg [2:0] funct3_out,
+    output reg [4:0] rd_sel_out, rs1_sel_out, rs2_sel_out,
+    output reg [6:0] funct7_out,
     
    /*----Immediate Register----*/
-    output reg [11:0] imm_value
-    );
+    output reg [11:0] imm_value_out,
+    
+    /*----MUX Select----*/
+    output reg imm_sel_out
+);
     
     localparam  reg_reg         = 7'b0110011,
                 immediate       = 7'b0010011,
@@ -44,22 +48,20 @@ module decoder(
    
    always @(*) begin
         // Set opcode from instruction
-        opcode <= instruction[6:0];
-        $display("Opcode: %0b", opcode);
+        opcode_out <= instruction[6:0];
+        
         // Decode opcode
-        case (opcode)
+        case (opcode_out)
             /*--[imm 31:20 | rs1 19:15 | funct3 14:12 | rd 11:7 | opcode 6:0]--*/
             immediate: begin
-                imm_value <= instruction[31:20];
-                rs1 <= instruction[19:15];
-                funct3 <= instruction[14:12];
-                rd <= instruction[11:7];
-                $display("%0b", imm_value);
+                imm_value_out <= instruction[31:20];
+                rs1_sel_out <= instruction[19:15];
+                funct3_out <= instruction[14:12];
+                rd_sel_out <= instruction[11:7];
+                imm_sel_out <= 1;
             end         
         endcase
         
    end         
-              
-         
-    
+
 endmodule
