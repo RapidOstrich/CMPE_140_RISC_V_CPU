@@ -36,7 +36,9 @@ module decoder(
     output reg [11:0] imm_value_out,
     
     /*----MUX Select----*/
-    output reg imm_sel_out
+    output reg imm_sel_out,
+    
+    output reg write_enable_out
 );
     
     localparam  reg_reg         = 7'b0110011,
@@ -59,6 +61,7 @@ module decoder(
                 funct3_out <= instruction[14:12];
                 rd_sel_out <= instruction[11:7];
                 imm_sel_out <= 1;
+                write_enable_out <= 1;
             end         
         endcase
         
