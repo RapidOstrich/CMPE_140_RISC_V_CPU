@@ -1,11 +1,11 @@
 Top level module is 'cpu.v'.
 
 CPU Block Components:
-  Decoder
-  ALU Multiplexer (Sign Extender)
-  ALU
-  Register File
-  Pipeline Registers
+  1. Decoder
+  2. ALU Multiplexer (Sign Extender)
+  3. ALU
+  4. Register File
+  5. Pipeline Registers
 
 4 Stages: Fetch --> Decode --> Execute --> Write Back
 
