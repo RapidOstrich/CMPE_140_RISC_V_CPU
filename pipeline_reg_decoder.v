@@ -41,7 +41,7 @@ module pipeline_reg_decoder(
         opcode_out <= opcode_in;
         funct7_out <= funct7_in;
         rd_sel_out <= rd_sel_in;
-        funct3_out <= funct3_in;
+        funct3_out <= funct3_in;   
     end
     
 endmodule
