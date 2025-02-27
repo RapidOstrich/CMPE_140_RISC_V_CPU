@@ -21,6 +21,8 @@
 
 
 module cpu(
+
+/*--------Required Ports--------*/
     // Active low reset & Clock
     input rst_n, clk,
     
@@ -34,7 +36,11 @@ module cpu(
     output [31:0] imem_addr, dmem_addr,
     
     // Data to & from memory
-    inout [31:0] dmem_data
+    inout [31:0] dmem_data,
+   
+/*--------Debugging Ports--------*/
+    output [4:0] rd_out
+   
 );
     
 /*--------FLAGS--------*/
@@ -43,7 +49,8 @@ module cpu(
 /*--------Wire Connections--------*/
     wire        imm_sel,
                 write_enable,
-                write_enable_reg;
+                write_enable_reg,
+                write_enable_alu;
     
     wire [31:0] instruction,
                 instruction_reg,
@@ -65,6 +72,7 @@ module cpu(
                 
     wire [4:0]  rd_sel,
                 rd_sel_reg,
+                rd_write_back,
                 rs1_sel,
                 rs1_sel_reg,
                 rs2_sel,
@@ -74,12 +82,15 @@ module cpu(
                 funct3_reg;    
     
 /*--------Pipeline Registers--------*/
+
+    /*--------Fetch--------*/
     pipeline_reg_instruction pri(
         .clk(clk),
         .instruction_in(instruction),
         .instruction_out(instruction_reg)
     );
     
+    /*--------Decode--------*/
     pipeline_reg_decoder prd(
         .clk(clk),
         .write_enable_in(write_enable),
@@ -98,9 +109,14 @@ module cpu(
         .funct3_out(funct3_reg)               
     );
     
+    /*--------Execute--------*/
     pipeline_reg_alu pra(
         .clk(clk),
+        .write_enable_in(write_enable_reg),
+        .rd_sel_in(rd_sel_reg),
         .alu_result_in(alu_result),
+        .write_enable_out(write_enable_alu),
+        .rd_sel_out(rd_write_back),
         .alu_result_out(alu_result_reg)
     );
     
@@ -114,7 +130,7 @@ module cpu(
     program_counter pc(
         .clk(clk),
         .rst_n(rst_n),
-        .program_count(/*----TODO----*/)
+        .program_count(imem_addr)
     );
     
     decoder dcr(
@@ -134,27 +150,30 @@ module cpu(
         .imm_sel_in(imm_sel),
         .imm_value_in(imm_value),
         .rs2_in(rs2_value),
-        .mux_out(mux_result)
+        .mux_result_out(mux_result)
     );
     
     alu alu(
         .opcode_in(opcode_reg),
         .funct3_in(funct3_reg),
         .funct7_in(funct7_reg),
-        .rs1_in(rs1_value_reg),
+        .rs1_value_in(rs1_value_reg),
         .mux_result_in(mux_result_reg),
         .alu_result_out(alu_result)
     );
     
     register_file rgf(
         .clk(clk),
-        .write_enable_in(write_enable_reg),
-        .rd_sel_in(rd_sel_reg),
+        .write_enable_in(write_enable_alu),
+        .rd_sel_in(rd_write_back),
         .rs1_sel_in(rs1_sel),
         .rs2_sel_in(rs2_sel),
         .write_data_in(alu_result_reg),
         .rs1_value_out(rs1_value),
-        .rs2_value_out(rs2_value)
+        .rs2_value_out(rs2_value),
+        
+        // Debugging
+        .rd_out(rd_out)
     );
 
 endmodule
