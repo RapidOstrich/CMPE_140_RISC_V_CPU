@@ -22,11 +22,16 @@
 
 module pipeline_reg_alu(
     input clk,
+    input write_enable_in,
+    input [5:0] rd_sel_in,
     input [31:0] alu_result_in,
+    output reg write_enable_out,
+    output reg [5:0] rd_sel_out,
     output reg [31:0] alu_result_out
 );
 
     always @(posedge clk) begin
+        rd_sel_out <= rd_sel_in;
         alu_result_out <= alu_result_in;
     end
 
