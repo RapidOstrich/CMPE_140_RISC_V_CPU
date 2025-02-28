@@ -31,7 +31,7 @@ module pipeline_reg_decoder(
     output reg [31:0] mux_result_out, rs1_value_out,
     output reg [6:0] opcode_out, funct7_out,
     output reg [4:0] rd_sel_out,
-    output reg [2:0] funct3_out    
+    output reg [2:0] funct3_out  
 );
     
     always @(posedge clk) begin
