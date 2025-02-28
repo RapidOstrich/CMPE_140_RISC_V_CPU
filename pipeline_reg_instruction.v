@@ -1,19 +1,19 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Company: SJSU
+// Engineer: Spenser The
 // 
-// Create Date: 02/21/2025 11:10:02 AM
-// Design Name: 
+// Create Date: 02/20/2025 04:34:50 PM
+// Design Name: RISC-V Pipeline Register
 // Module Name: pipeline_reg_instruction
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
+// Project Name: CMPE 140 RISC-V Processor
+// Target Devices: NA
+// Tool Versions: NA
+// Description: Pipeline register for the fetch stage.
 // 
-// Dependencies: 
+// Dependencies: NA
 // 
-// Revision:
+// Revision: 1.0
 // Revision 0.01 - File Created
 // Additional Comments:
 // 
