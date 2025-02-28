@@ -23,11 +23,17 @@
 module pipeline_reg_instruction(
     input clk,
     input [31:0] instruction_in,
-    output reg [31:0] instruction_out
+    output reg [31:0] instruction_out,
+    
+/*--------Trace Debugging--------*/    
+    output reg [31:0] trace_instruction
 );
 
     always @(posedge clk) begin
         instruction_out <= instruction_in;
+        
+        /*----Trace Debugging----*/
+        trace_instruction <= instruction_in;
     end
 
 endmodule
