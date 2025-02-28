@@ -21,7 +21,6 @@
 
 
 module cpu(
-
 /*--------Required Ports--------*/
     // Active low reset & Clock
     input rst_n, clk,
@@ -36,15 +35,12 @@ module cpu(
     output [31:0] imem_addr, dmem_addr,
     
     // Data to & from memory
-    inout [31:0] dmem_data,
-   
-/*--------Debugging Ports--------*/
-    output [4:0] rd_out
-   
-);
+    inout [31:0] dmem_data,  
     
-/*--------FLAGS--------*/
-  
+/*--------Trace Ports--------*/
+    output [31:0] trace_instruction, trace_rd_value, trace_rs2_value,
+    output [4:0] trace_rd, trace_rs1, trace_rs2
+);
     
 /*--------Wire Connections--------*/
     wire        imm_sel,
@@ -52,8 +48,7 @@ module cpu(
                 write_enable_reg,
                 write_enable_alu;
     
-    wire [31:0] instruction,
-                instruction_reg,
+    wire [31:0] instruction_reg,
                 mux_result,
                 mux_result_reg,
                 rs1_value,
@@ -86,8 +81,11 @@ module cpu(
     /*--------Fetch--------*/
     pipeline_reg_instruction pri(
         .clk(clk),
-        .instruction_in(instruction),
-        .instruction_out(instruction_reg)
+        .instruction_in(imem_insn),
+        .instruction_out(instruction_reg),
+        
+        /*----Trace Debugging----*/        
+        .trace_instruction(trace_instruction)
     );
     
     /*--------Decode--------*/
@@ -106,7 +104,7 @@ module cpu(
         .opcode_out(opcode_reg),
         .funct7_out(funct7_reg),
         .rd_sel_out(rd_sel_reg),
-        .funct3_out(funct3_reg)               
+        .funct3_out(funct3_reg)    
     );
     
     /*--------Execute--------*/
@@ -117,7 +115,10 @@ module cpu(
         .alu_result_in(alu_result),
         .write_enable_out(write_enable_alu),
         .rd_sel_out(rd_write_back),
-        .alu_result_out(alu_result_reg)
+        .alu_result_out(alu_result_reg),
+        
+        /*----Trace Debugging----*/
+        .trace_result(trace_rs2_value)
     );
     
 /*--------Block Components--------*/
@@ -172,8 +173,11 @@ module cpu(
         .rs1_value_out(rs1_value),
         .rs2_value_out(rs2_value),
         
-        // Debugging
-        .rd_out(rd_out)
+        /*----Trace Debugging----*/
+        .trace_rd(trace_rd),
+        .trace_rs1(trace_rs1),
+        .trace_rs2(trace_rs2),
+        .trace_write_in(trace_rd_value) 
     );
 
 endmodule
