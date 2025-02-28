@@ -1,19 +1,19 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Company: SJSU
+// Engineer: Spenser The
 // 
-// Create Date: 02/20/2025 10:34:40 AM
-// Design Name: 
-// Module Name: program_counter
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
+// Create Date: 02/20/2025 04:34:50 PM
+// Design Name: Clock Cycle Counter
+// Module Name: cc_counter
+// Project Name: CMPE 140 RISC-V Processor
+// Target Devices: NA
+// Tool Versions: NA
+// Description: Increments counter every clock cycle.
 // 
-// Dependencies: 
+// Dependencies: NA
 // 
-// Revision:
+// Revision: 1.0
 // Revision 0.01 - File Created
 // Additional Comments:
 // 
@@ -21,16 +21,14 @@
 
 
 module cc_counter(
-    // Active low reset, Clock, and program start flag
     input rst_n, clk,
-
-    // Clock cycle count
     output reg [15:0] cc_count
 );
-    
+
+    /*----Program Start Flag----*/
     reg prog_start;
     
-    // Start program counter & start flag at 0
+    /*----Init Counter & Flag----*/
     initial begin
         cc_count <= 0;
         prog_start <= 0;
@@ -40,10 +38,8 @@ module cc_counter(
         if (rst_n) begin
             prog_start <= 1;
         end
-    
         // ELSE block?
-    
-        // Increment program counter
+
         if (prog_start) begin
             cc_count <= cc_count + 1; 
         end
