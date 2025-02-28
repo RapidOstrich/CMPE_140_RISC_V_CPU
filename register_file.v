@@ -1,19 +1,19 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Company: SJSU
+// Engineer: Spenser The
 // 
-// Create Date: 02/20/2025 09:10:49 PM
-// Design Name: 
+// Create Date: 02/20/2025 04:34:50 PM
+// Design Name: RISC-V Register File
 // Module Name: register_file
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
+// Project Name: CMPE 140 RISC-V Processor
+// Target Devices: NA
+// Tool Versions: NA
+// Description: The register file for all 32 CPU registers.
 // 
-// Dependencies: 
+// Dependencies: NA
 // 
-// Revision:
+// Revision: 1.0
 // Revision 0.01 - File Created
 // Additional Comments:
 // 
@@ -31,18 +31,18 @@ module register_file(
     output reg [31:0] trace_write_in
 );
 
-    // Register file: 32 registers, each 32 bits wide
+    /*--Register file: 32 registers, each 32 bits wide--*/
     reg [31:0] registers [0:31];
 
-    // Asynchronous read: Read values based on rs1 and rs2 select inputs
+    /*--Asynchronous read: Read values based on rs1 and rs2 select inputs--*/
     always @(*) begin
         rs1_value_out = (rs1_sel_in == 5'b00000) ? 32'b0 : registers[rs1_sel_in];
         rs2_value_out = (rs2_sel_in == 5'b00000) ? 32'b0 : registers[rs2_sel_in];
     end
 
-    // Synchronous write: Write data on clock edge if enabled
+    /*--Synchronous write: Write data on clock edge if enabled--*/
     always @(posedge clk) begin
-        if (write_enable_in && rd_sel_in != 5'b00000) begin  // Prevents writing to register 0
+        if (write_enable_in && rd_sel_in != 5'b00000) begin
             registers[rd_sel_in] <= write_data_in;
         end   
             
