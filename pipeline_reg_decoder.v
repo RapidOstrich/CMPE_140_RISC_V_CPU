@@ -5,7 +5,7 @@
 // 
 // Create Date: 02/20/2025 04:34:50 PM
 // Design Name: RISC-V Pipeline Register
-// Module Name: pipeline_reg_alu
+// Module Name: pipeline_reg_decoder
 // Project Name: CMPE 140 RISC-V Processor
 // Target Devices: NA
 // Tool Versions: NA
