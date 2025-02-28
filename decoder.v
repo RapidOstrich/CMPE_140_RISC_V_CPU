@@ -1,19 +1,19 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Company: SJSU
+// Engineer: Spenser The
 // 
-// Create Date: 02/20/2025 10:44:40 AM
-// Design Name: 
+// Create Date: 02/20/2025 04:34:50 PM
+// Design Name: RISC-V Instruction Decoder
 // Module Name: decoder
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
+// Project Name: CMPE 140 RISC-V Processor
+// Target Devices: NA
+// Tool Versions: NA
+// Description: Decodes the 32-bit instruction into it's respective components.
 // 
-// Dependencies: 
+// Dependencies: NA
 // 
-// Revision:
+// Revision: 1.0
 // Revision 0.01 - File Created
 // Additional Comments:
 // 
@@ -21,31 +21,18 @@
 
 
 module decoder(
-
+    /*----Inputs----*/
     input [31:0] instruction,
-    
-   /*----Static partition----*/     
-    output reg [6:0] opcode_out,
-    
-   /*----Dynamic partition----*/
+    /*----Outputs----*/
+    output reg imm_sel_out, write_enable_out,
     output reg [2:0] funct3_out,
     output reg [4:0] rd_sel_out, rs1_sel_out, rs2_sel_out,
-    output reg [6:0] funct7_out,
-    
-   /*----Immediate Register----*/
-    output reg [11:0] imm_value_out,
-    
-    /*----MUX Select----*/
-    output reg imm_sel_out,
-    
-    /*----Write Signal----*/
-    output reg write_enable_out
-    
-/*--------Trace Debugging--------*/
-    
-    
+    output reg [6:0] funct7_out, opcode_out,
+    output reg [11:0] imm_value_out
+
 );
     
+    /*--------Switch Cases--------*/
     localparam  reg_reg         = 7'b0110011,
                 immediate       = 7'b0010011,
                 upper_immediate = 7'b0110111,
@@ -54,10 +41,10 @@ module decoder(
                 jump            = 7'b1101111;
    
    always @(*) begin
-        // Set opcode from instruction
+       
+        /*----Init Opcode----*/
         opcode_out <= instruction[6:0];
         
-        // Decode opcode
         case (opcode_out)
             /*--[imm 31:20 | rs1 19:15 | funct3 14:12 | rd 11:7 | opcode 6:0]--*/
             immediate: begin
@@ -67,9 +54,11 @@ module decoder(
                 rd_sel_out <= instruction[11:7];
                 imm_sel_out <= 1;
                 write_enable_out <= 1;
-            end         
+            end
+            /*----Remaining Opcodes TODO----*/
+            
         endcase
         
-   end         
-
+   end
+    
 endmodule
