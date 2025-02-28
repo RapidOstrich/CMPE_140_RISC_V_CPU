@@ -26,8 +26,9 @@ module register_file(
     input [31:0] write_data_in,
     output reg [31:0] rs1_value_out, rs2_value_out,
     
-    // Debugging
-    output reg [4:0] rd_out
+/*--------Trace Debugging--------*/
+    output reg [4:0] trace_rd, trace_rs1, trace_rs2,
+    output reg [31:0] trace_write_in
 );
 
     // Register file: 32 registers, each 32 bits wide
@@ -41,11 +42,16 @@ module register_file(
 
     // Synchronous write: Write data on clock edge if enabled
     always @(posedge clk) begin
-        if (write_enable_in && rd_sel_in != 5'b00000)  // Prevents writing to register 0
+        if (write_enable_in && rd_sel_in != 5'b00000) begin  // Prevents writing to register 0
             registers[rd_sel_in] <= write_data_in;
+        end   
             
-            // Debugging
-            rd_out <= rd_sel_in;
+   /*--------Trace Debugging--------*/
+        trace_rd <= rd_sel_in;
+        trace_rs1 <= rs1_sel_in;
+        trace_rs2 <= rs2_sel_in;
+        trace_write_in <= write_data_in;
+        
     end
 
 endmodule
