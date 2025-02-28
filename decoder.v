@@ -38,7 +38,12 @@ module decoder(
     /*----MUX Select----*/
     output reg imm_sel_out,
     
+    /*----Write Signal----*/
     output reg write_enable_out
+    
+/*--------Trace Debugging--------*/
+    
+    
 );
     
     localparam  reg_reg         = 7'b0110011,
