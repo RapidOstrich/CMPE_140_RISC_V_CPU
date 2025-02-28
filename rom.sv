@@ -14,6 +14,6 @@ module rom #(addr_width = 32, data_width = 32, string init_file = "dummy.dat" )(
             end*/
     end
         
-    assign data = {mem[addr+3], mem[addr+2], mem[addr+1], mem[addr]};
+    assign data = {mem[addr + 3], mem[addr + 2], mem[addr + 1], mem[addr]};
 
 endmodule
