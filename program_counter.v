@@ -1,19 +1,19 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Company: SJSU
+// Engineer: Spenser The
 // 
-// Create Date: 02/20/2025 10:34:40 AM
-// Design Name: 
+// Create Date: 02/20/2025 04:34:50 PM
+// Design Name: RISC-V Program Counter
 // Module Name: program_counter
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
+// Project Name: CMPE 140 RISC-V Processor
+// Target Devices: NA
+// Tool Versions: NA
+// Description: Program counter for RISC-V processor
 // 
-// Dependencies: 
+// Dependencies: NA
 // 
-// Revision:
+// Revision: 1.0
 // Revision 0.01 - File Created
 // Additional Comments:
 // 
