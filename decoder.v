@@ -28,8 +28,9 @@ module decoder(
     output reg [2:0] funct3_out,
     output reg [4:0] rd_sel_out, rs1_sel_out, rs2_sel_out,
     output reg [6:0] funct7_out, opcode_out,
-    output reg [11:0] imm_value_out
-
+    output reg [11:0] imm_value_out,
+    /*----Hazard Signals----*/
+    output reg [4:0] hazard_rs1_out
 );
     
     /*--------Switch Cases--------*/
@@ -54,6 +55,8 @@ module decoder(
                 rd_sel_out <= instruction[11:7];
                 imm_sel_out <= 1;
                 write_enable_out <= 1;
+                /*----Hazard Signal----*/
+                hazard_rs1_out <= instruction[19:15];                
             end
             /*----Remaining Opcodes TODO----*/
             
