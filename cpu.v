@@ -38,7 +38,8 @@ module cpu(
     inout [31:0] dmem_data,  
     
 /*--------Trace Ports--------*/
-    output [31:0] trace_instruction, trace_rd_value, trace_rs2_value,
+    output [31:0] trace_instruction, trace_rd_value,
+    output [11:0] trace_imm,
     output [4:0] trace_rd, trace_rs1, trace_rs2
 );
     
@@ -46,11 +47,13 @@ module cpu(
     wire        imm_sel,
                 write_enable,
                 write_enable_reg,
-                write_enable_alu;
+                write_enable_alu,
+                hazard_raw;
     
     wire [31:0] instruction_reg,
                 mux_result,
                 mux_result_reg,
+                hazard_rd_value,
                 rs1_value,
                 rs1_value_reg,
                 rs2_value,
@@ -67,6 +70,8 @@ module cpu(
                 
     wire [4:0]  rd_sel,
                 rd_sel_reg,
+                hazard_rd_sel,
+                hazard_rs1,
                 rd_write_back,
                 rs1_sel,
                 rs1_sel_reg,
@@ -104,7 +109,10 @@ module cpu(
         .opcode_out(opcode_reg),
         .funct7_out(funct7_reg),
         .rd_sel_out(rd_sel_reg),
-        .funct3_out(funct3_reg)    
+        .funct3_out(funct3_reg),
+        /*----Hazard Signals----*/
+        .hazard_raw_in(hazard_raw),
+        .hazard_rd_value_in(hazard_rd_value)    
     );
     
     /*--------Execute--------*/
@@ -116,9 +124,10 @@ module cpu(
         .write_enable_out(write_enable_alu),
         .rd_sel_out(rd_write_back),
         .alu_result_out(alu_result_reg),
-        
-        /*----Trace Debugging----*/
-        .trace_result(trace_rs2_value)
+        /*----Hazard Signals----*/
+        .hazard_rs1_sel_in(hazard_rs1),
+        .hazard_raw_out(hazard_raw),
+        .hazard_rd_value_out(hazard_rd_value)
     );
     
 /*--------Block Components--------*/
@@ -144,14 +153,19 @@ module cpu(
         .imm_value_out(imm_value),
         .opcode_out(opcode),
         .imm_sel_out(imm_sel),
-        .write_enable_out(write_enable)
+        .write_enable_out(write_enable),
+        /*----Hazard Signals----*/
+        .hazard_rs1_out(hazard_rs1)     
     );
     
     mux_alu mux(
         .imm_sel_in(imm_sel),
         .imm_value_in(imm_value),
         .rs2_in(rs2_value),
-        .mux_result_out(mux_result)
+        .mux_result_out(mux_result),
+        
+        /*----Trace Debugging----*/
+        .trace_imm(trace_imm)
     );
     
     alu alu(
