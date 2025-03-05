@@ -46,7 +46,8 @@ module tb();
     wire dmem_wen;
     
 /*--------Trace Debugging--------*/
-    wire [31:0] trace_instruction, trace_rd_value, trace_rs2_value;
+    wire [31:0] trace_instruction, trace_rd_value;
+    wire [11:0] trace_imm;
     wire [4:0] trace_rd, trace_rs1, trace_rs2;
 
 /*--------Module Instantiations--------*/
@@ -60,14 +61,15 @@ module tb();
         .trace_rs1(trace_rs1),
         .trace_rs2(trace_rs2),
         .trace_rd_value(trace_rd_value),
-        .imm(trace_rs2_value)
+        .trace_imm(trace_imm)
     );
     
     // Change to the file you need
     rom#(
         .addr_width(address_size),
         .data_width(word_size),
-        .init_file("addi_nohazard-1.dat")
+        //.init_file("addi_nohazard-1.dat")
+        .init_file("addi_hazards.dat")
     )
     imem(
         .addr(imem_addr),
