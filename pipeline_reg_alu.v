@@ -26,28 +26,16 @@ module pipeline_reg_alu(
     input [4:0] rd_sel_in,
     input [31:0] alu_result_in,
     output reg write_enable_out,
-    output reg [4:0] rd_sel_out,
-    output reg [31:0] alu_result_out,
-    /*--------Hazard Signals--------*/
-    input [4:0] hazard_rs1_sel_in,
-    output reg hazard_raw_out,
-    output reg [31:0] hazard_rd_value_out
+    output reg [4:0] rd_sel_out, rd_write_back_out,
+    output reg [31:0] alu_result_out, rd_wb_value_out
 );
 
     always @(posedge clk) begin
         rd_sel_out <= rd_sel_in;
         alu_result_out <= alu_result_in;
         write_enable_out <= write_enable_in;
-        
-        /*--------Hazard Handling--------*/
-        hazard_rd_value_out <= alu_result_in;     
-        
-        if (hazard_rs1_sel_in == rd_sel_in) begin
-            hazard_raw_out <= 1;
-        end
-        else begin
-            hazard_raw_out <= 0;
-        end                             
+        rd_write_back_out <= rd_sel_in;
+        rd_wb_value_out <= alu_result_in;                  
     end
-   
+  
 endmodule
