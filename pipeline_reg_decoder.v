@@ -30,7 +30,7 @@ module pipeline_reg_decoder(
     output reg write_enable_out,
     output reg [31:0] mux_result_out, rs1_value_out,
     output reg [6:0] opcode_out, funct7_out,
-    output reg [4:0] rd_sel_out,
+    output reg [4:0] rd_sel_out, raw_rd,
     output reg [2:0] funct3_out
 );
     
@@ -42,6 +42,7 @@ module pipeline_reg_decoder(
         funct7_out <= funct7_in;
         rd_sel_out <= rd_sel_in;
         funct3_out <= funct3_in;
+        raw_rd <= rd_sel_in;  
     end
-    
+
 endmodule
