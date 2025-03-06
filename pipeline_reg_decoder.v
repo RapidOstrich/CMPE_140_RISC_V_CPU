@@ -31,32 +31,17 @@ module pipeline_reg_decoder(
     output reg [31:0] mux_result_out, rs1_value_out,
     output reg [6:0] opcode_out, funct7_out,
     output reg [4:0] rd_sel_out,
-    output reg [2:0] funct3_out,
-    /*----Hazard Signals----*/
-    input hazard_raw_in,
-    input [31:0] hazard_rd_value_in
+    output reg [2:0] funct3_out
 );
     
     always @(posedge clk) begin
         write_enable_out <= write_enable_in;
         mux_result_out <= mux_result_in;
+        rs1_value_out <= rs1_value_in;
         opcode_out <= opcode_in;
         funct7_out <= funct7_in;
         rd_sel_out <= rd_sel_in;
         funct3_out <= funct3_in;
-        
-        /*----RAW Hazard----*/
-        /*
-        1. Check if rs1 is being written in previous instruction
-        2. If yes, retrieve value from ALU pipeline register
-        3. If no, proceed as normal
-        */
-        if (hazard_raw_in) begin
-            rs1_value_out <= hazard_rd_value_in;
-        end
-        else begin
-            rs1_value_out <= rs1_value_in;
-        end        
     end
     
 endmodule
