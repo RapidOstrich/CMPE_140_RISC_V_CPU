@@ -24,7 +24,7 @@ module alu(
     input [2:0] funct3_in,    
     input [6:0] opcode_in, funct7_in,
     input [31:0] rs1_value_in, mux_result_in,    
-    output reg [31:0] alu_result_out
+    output reg [31:0] alu_result_out, raw_output
 );
     
     /*----Switch Cases----*/
@@ -55,7 +55,10 @@ module alu(
                 /*----TODO----*/
             end
             
-        endcase  
+        endcase
+        
+        raw_output <= alu_result_out;
+          
     end        
     
 endmodule
