@@ -22,23 +22,25 @@
 
 module raw_handler(
     input clk,
-    input [4:0] rs1_sel_in, rs2_sel_in, rd_write_back_in,
-    input [31:0] rs1_value_in, rs2_value_in, rd_value_in,
-    output [4:0] get_rs1, get_rs2,
-    output [31:0] rs1_value_out, rs2_value_out    
+    input [4:0] rs1_sel_in, rs2_sel_in, rd_write_back_in, rd_write_back_in_2,
+    input [31:0] rs1_value_in, rs2_value_in, rd_value_in, rd_wb_value_2,
+    output reg [4:0] get_rs1, get_rs2,
+    output reg [31:0] rs1_value_out, rs2_value_out    
 );
-    
-    assign get_rs1 = rs1_sel_in;
-    assign get_rs2 = rs2_sel_in;
-    assign rs1_value_out = (rs1_sel_in == rd_write_back_in) ? rd_value_in : rs1_value_in;
-    assign rs2_value_out = (rs2_sel_in == rd_write_back_in) ? rd_value_in : rs2_value_in;
 
-/*
     always @(*) begin
+    
+        get_rs1 <= rs1_sel_in;
+        get_rs2 <= rs2_sel_in;
 
         if (rs1_sel_in == rd_write_back_in) begin
             rs1_value_out <= rd_value_in;
         end
+        
+        else if (rs1_sel_in == rd_write_back_in_2) begin
+            rs1_value_out <= rd_wb_value_2;
+        end
+        
         else begin
             rs1_value_out <= rs1_value_in;
         end
@@ -46,10 +48,15 @@ module raw_handler(
         if (rs2_sel_in == rd_write_back_in) begin
             rs2_value_out <= rd_value_in;
         end
+        
+        else if (rs2_sel_in == rd_write_back_in_2) begin
+            rs2_value_out <= rd_wb_value_2;
+        end        
+        
         else begin
             rs2_value_out <= rs2_value_in;
         end
 
     end
-*/
+
 endmodule
