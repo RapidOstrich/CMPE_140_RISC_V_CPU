@@ -1,15 +1,15 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Company: SJSU
+// Engineer: Spenser The
 // 
 // Create Date: 02/20/2025 09:31:49 AM
-// Design Name: 
+// Design Name: RISC-V CPU
 // Module Name: cpu
-// Project Name: 
+// Project Name: CMPE 140 RISC-V Processor
 // Target Devices: 
 // Tool Versions: 
-// Description: 
+// Description: Top level module for CPU.
 // 
 // Dependencies: 
 // 
@@ -59,6 +59,7 @@ module cpu(
                 alu_result,
                 alu_result_reg,
                 rd_wb_value,
+                rd_wb_value_2,
                 raw_rs1_value,
                 raw_rs2_value;
                 
@@ -73,6 +74,7 @@ module cpu(
                 rd_sel_reg,
                 rd_sel_wb,
                 rd_write_back,
+                rd_write_back_2,
                 rs1_sel,
                 rs1_sel_reg,
                 rs2_sel,
@@ -111,7 +113,8 @@ module cpu(
         .opcode_out(opcode_reg),
         .funct7_out(funct7_reg),
         .rd_sel_out(rd_sel_reg),
-        .funct3_out(funct3_reg)
+        .funct3_out(funct3_reg),
+        .raw_rd(rd_write_back)
     );
     
     /*--------Execute--------*/
@@ -123,8 +126,8 @@ module cpu(
         .write_enable_out(write_enable_alu),
         .rd_sel_out(rd_sel_wb),
         .alu_result_out(alu_result_reg),
-        .rd_write_back_out(rd_write_back),
-        .rd_wb_value_out(rd_wb_value)
+        .rd_write_back_2(rd_write_back_2),
+        .rd_wb_value_2(rd_wb_value_2)
     );
     
 /*--------Block Components--------*/
@@ -169,7 +172,8 @@ module cpu(
         .funct7_in(funct7_reg),
         .rs1_value_in(rs1_value_reg),
         .mux_result_in(mux_result_reg),
-        .alu_result_out(alu_result)
+        .alu_result_out(alu_result),
+        .raw_output(rd_wb_value)
     );
     
     raw_handler rwh(
@@ -177,9 +181,11 @@ module cpu(
         .rs1_sel_in(rs1_sel),
         .rs2_sel_in(rs2_sel),
         .rd_write_back_in(rd_write_back),
+        .rd_write_back_in_2(rd_write_back_2),
         .rs1_value_in(rs1_value),
         .rs2_value_in(rs2_value),
         .rd_value_in(rd_wb_value),
+        .rd_wb_value_2(rd_wb_value_2),
         .get_rs1(get_rs1),
         .get_rs2(get_rs2),
         .rs1_value_out(raw_rs1_value),
