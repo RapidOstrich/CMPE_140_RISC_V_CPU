@@ -50,7 +50,7 @@ module register_file(
         trace_rd <= rd_sel_in;
         trace_rs1 <= rs1_sel_in;
         trace_rs2 <= rs2_sel_in;
-        trace_write_in <= write_data_in;
+        trace_write_in <= write_data_in;   
         
     end
 
