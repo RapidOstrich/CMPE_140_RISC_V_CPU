@@ -36,8 +36,8 @@ module register_file(
 
     /*--Asynchronous read: Read values based on rs1 and rs2 select inputs--*/
     always @(*) begin
-        rs1_value_out = (rs1_sel_in == 5'b00000) ? 32'b0 : registers[rs1_sel_in];
-        rs2_value_out = (rs2_sel_in == 5'b00000) ? 32'b0 : registers[rs2_sel_in];
+        rs1_value_out <= (rs1_sel_in == 5'b00000) ? 32'b0 : registers[rs1_sel_in];
+        rs2_value_out <= (rs2_sel_in == 5'b00000) ? 32'b0 : registers[rs2_sel_in];
     end
 
     /*--Synchronous write: Write data on clock edge if enabled--*/
