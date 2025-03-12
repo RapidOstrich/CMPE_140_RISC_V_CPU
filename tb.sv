@@ -36,6 +36,9 @@ module tb();
         rst_n = 0;
         clk = 0;
         #35 rst_n = 1;
+        
+        #300;
+        $finish;
     end
     
 /*--------Wire Connections--------*/    
@@ -68,8 +71,8 @@ module tb();
     rom#(
         .addr_width(address_size),
         .data_width(word_size),
-        .init_file("addi_nohazard-1.dat")
-        //.init_file("addi_hazards.dat")
+        //.init_file("addi_nohazard-1.dat")
+        .init_file("addi_hazards.dat")
     )
     imem(
         .addr(imem_addr),
