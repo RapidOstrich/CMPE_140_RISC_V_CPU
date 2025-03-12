@@ -37,11 +37,14 @@ module alu(
             immediate: begin
                 case (funct3_in)
                     3'b000: alu_result_out <= rs1_value_in + mux_result_in;
-                    //3'b001: /*----Shift Left Logical Imm----*/
-                    //3'b010: /*----Set Less Than Imm----*/
-                    //3'b011: /*----Set Less Than Imm (U)----*/
+                    3'b001: alu_result_out <= rs1_value_in << mux_result_in[4:0];
+                    3'b010: alu_result_out <= ($signed(rs1_value_in) < $signed(mux_result_in)) ? 1 : 0;
+                    3'b011: alu_result_out <= (rs1_value_in < mux_result_in) ? 1 : 0;
                     3'b100: alu_result_out <= rs1_value_in ^ mux_result_in;
-                    //3'b101: /*----TODO----*/
+                    3'b101: begin
+                        if (mux_result_in[11:5] == 0) alu_result_out <= rs1_value_in >> mux_result_in[4:0];
+                        else alu_result_out <= rs1_value_in >>> mux_result_in[4:0];
+                    end
                     3'b110: alu_result_out <= rs1_value_in | mux_result_in;
                     3'b111: alu_result_out <= rs1_value_in & mux_result_in;          
                 endcase
