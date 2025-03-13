@@ -43,7 +43,7 @@ module alu(
                     3'b100: alu_result_out <= rs1_value_in ^ mux_result_in;
                     3'b101: begin
                         if (mux_result_in[11:5] == 0) alu_result_out <= rs1_value_in >> mux_result_in[4:0];
-                        else alu_result_out <= rs1_value_in >>> mux_result_in[4:0];
+                        else alu_result_out <= $signed(rs1_value_in) >>> mux_result_in[4:0];
                     end
                     3'b110: alu_result_out <= rs1_value_in | mux_result_in;
                     3'b111: alu_result_out <= rs1_value_in & mux_result_in;          
