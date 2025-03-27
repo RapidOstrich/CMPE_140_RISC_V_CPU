@@ -37,7 +37,7 @@ module tb();
         clk = 0;
         #35 rst_n = 1;
         
-        #300;
+        #400;
         $finish;
     end
     
@@ -72,7 +72,8 @@ module tb();
         .addr_width(address_size),
         .data_width(word_size),
         //.init_file("addi_nohazard-1.dat")
-        .init_file("addi_hazards.dat")
+        //.init_file("addi_hazards.dat")
+        .init_file("r_type.dat")
     )
     imem(
         .addr(imem_addr),
