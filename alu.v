@@ -56,13 +56,13 @@ module alu(
                         if (funct7_in == 0) alu_result_out <= rs1_value_in + mux_result_in;
                         else alu_result_out <= rs1_value_in - mux_result_in;
                     end
-                    3'b001: alu_result_out <= rs1_value_in << mux_result_in;
+                    3'b001: alu_result_out <= rs1_value_in << mux_result_in[4:0];
                     3'b010: alu_result_out <= ($signed(rs1_value_in) < $signed(mux_result_in)) ? 1 : 0;
                     3'b011: alu_result_out <= (rs1_value_in < mux_result_in) ? 1 : 0;
                     3'b100: alu_result_out <= rs1_value_in ^ mux_result_in;
                     3'b101: begin
-                        if (funct7_in == 0) alu_result_out <= rs1_value_in >> mux_result_in;
-                        else alu_result_out <= $signed(rs1_value_in) >> $signed(mux_result_in);
+                        if (funct7_in == 0) alu_result_out <= rs1_value_in >> mux_result_in[4:0];
+                        else alu_result_out <= $signed(rs1_value_in) >> $signed(mux_result_in[4:0]);
                     end
                     3'b110: alu_result_out <= rs1_value_in | mux_result_in;
                     3'b111: alu_result_out <= rs1_value_in & mux_result_in;
