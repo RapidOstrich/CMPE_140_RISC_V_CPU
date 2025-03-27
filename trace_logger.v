@@ -44,16 +44,16 @@ module trace_logger(
             $display("Error opening write_back.txt");            
         end
     
-        $display("Instr \t\t | \t rd \t | \t rs1 \t | \t imm \t | \t [rd]");
+        $display("Instr \t\t | \t rd \t | \t rs1 \t | \t rs2 \t | \t imm \t | \t [rd]");
         
-        #335;
+        #435;
         $fclose(fd_1);
         $fclose(fd_2);           
     end
     
     always @(posedge clk) begin
         if (rst_n) begin                   
-            $display("%h \t | \t x%d \t | \t x%d \t | %d \t |  %d", trace_instruction, trace_rd, trace_rs1, trace_imm, trace_rd_value);
+            $display("%h \t | \t x%d \t | \t x%d \t | \t x%d \t | %d \t |  %d", trace_instruction, trace_rd, trace_rs1, trace_rs2, trace_imm, trace_rd_value);
         end
     end
     
