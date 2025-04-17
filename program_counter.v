@@ -1,3 +1,4 @@
+
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: SJSU
@@ -21,17 +22,15 @@
 
 
 module program_counter(
-    input clk, rst_n,
-    output reg [31:0] program_count
+    input               clk,
+                        rst_n,
+                        
+    output reg [31:0]   program_count
 );
 
     always @(posedge clk) begin
-        if (!rst_n) begin
-            program_count <= 0;
-        end
-        else begin
-            program_count <= program_count + 4;
-        end
+        if (!rst_n) program_count <= 0;
+        else program_count <= program_count + 4;
     end
 
 endmodule

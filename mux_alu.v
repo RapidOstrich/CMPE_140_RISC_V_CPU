@@ -21,18 +21,21 @@
 
 
 module mux_alu(
-    input imm_sel_in,
-    input [11:0] imm_value_in,
-    input [31:0] rs2_value_in,
-    output [31:0] mux_result_out,
+    input           DCR_imm_sel,
+    
+    input [11:0]    DCR_imm_val,
+    
+    input [31:0]    RAW_rs2_val,
+    
+    output [31:0]   MUX_mux_val,
     
 /*--------Trace Debugging--------*/
-    output [11:0] trace_imm    
+    output [11:0]   TRACE_imm_val   
 );
 
-    assign mux_result_out = (imm_sel_in) ? {{20{imm_value_in[11]}}, imm_value_in} : rs2_value_in;
+    assign MUX_mux_val = (DCR_imm_sel) ? {{20{DCR_imm_val[11]}}, DCR_imm_val} : RAW_rs2_val;
     
     /*--------Trace Debugging--------*/
-    assign trace_imm = imm_value_in;
+    assign TRACE_imm_val = DCR_imm_val;
     
 endmodule

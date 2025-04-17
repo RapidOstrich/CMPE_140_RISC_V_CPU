@@ -23,190 +23,255 @@
 module cpu(
 /*--------Required Ports--------*/
     // Active low reset & Clock
-    input rst_n, clk,
+    input           rst_n,
+                    clk,
     
     // Instruction from Instruction memory
-    input [31:0] imem_insn,
+    input [31:0]    imem_insn,
     
     // Write enable for data memory
-    output dmem_wen,
+    output          dmem_wen,
+    
+    // Byte selection for stores
+    output [3:0]    byte_en,
     
     // Instruction memory address & Data memory address
-    output [31:0] imem_addr, dmem_addr,
+    output [31:0]   imem_addr,
+                    dmem_addr,
     
     // Data to & from memory
-    inout [31:0] dmem_data,  
+    inout [31:0]    dmem_data,  
     
 /*--------Trace Ports--------*/
-    output [31:0] trace_instruction, trace_rd_value,
-    output [11:0] trace_imm,
-    output [4:0] trace_rd, trace_rs1, trace_rs2
-);
-    
-/*--------Wire Connections--------*/
-    wire        imm_sel,
-                write_enable,
-                write_enable_reg,
-                write_enable_alu;
-    
-    wire [31:0] instruction_reg,
-                mux_result,
-                mux_result_reg,
-                rs1_value,
-                rs1_value_reg,
-                rs2_value,
-                rs2_value_reg,
-                alu_result,
-                alu_result_reg,
-                rd_wb_value,
-                rd_wb_value_2,
-                raw_rs1_value,
-                raw_rs2_value;
-                
-    wire [11:0] imm_value;
-    
-    wire [6:0]  funct7,
-                funct7_reg,
-                opcode,
-                opcode_reg;
-                
-    wire [4:0]  rd_sel,
-                rd_sel_reg,
-                rd_sel_wb,
-                rd_write_back,
-                rd_write_back_2,
-                rs1_sel,
-                rs1_sel_reg,
-                rs2_sel,
-                rs2_sel_reg,
-                get_rs1,
-                get_rs2;                
-                
-    wire [2:0]  funct3,
-                funct3_reg;    
-    
-/*--------Pipeline Registers--------*/
-
-    /*--------Fetch--------*/
-    pipeline_reg_instruction pri(
-        .clk(clk),
-        .instruction_in(imem_insn),
-        .instruction_out(instruction_reg),
+    output [4:0]    trace_rd,
+                    trace_rs1,
+                    trace_rs2,
+                    
+    output [11:0]   trace_imm,
         
-        /*----Trace Debugging----*/        
-        .trace_instruction(trace_instruction)
-    );
-    
-    /*--------Decode--------*/
-    pipeline_reg_decoder prd(
-        .clk(clk),
-        .write_enable_in(write_enable),
-        .mux_result_in(mux_result),
-        .rs1_value_in(raw_rs1_value),
-        .opcode_in(opcode),
-        .funct7_in(funct7),
-        .rd_sel_in(rd_sel),
-        .funct3_in(funct3),
-        .write_enable_out(write_enable_reg),
-        .mux_result_out(mux_result_reg),
-        .rs1_value_out(rs1_value_reg),
-        .opcode_out(opcode_reg),
-        .funct7_out(funct7_reg),
-        .rd_sel_out(rd_sel_reg),
-        .funct3_out(funct3_reg),
-        .raw_rd(rd_write_back)
-    );
-    
-    /*--------Execute--------*/
-    pipeline_reg_alu pra(
-        .clk(clk),
-        .write_enable_in(write_enable_reg),
-        .rd_sel_in(rd_sel_reg),
-        .alu_result_in(alu_result),
-        .write_enable_out(write_enable_alu),
-        .rd_sel_out(rd_sel_wb),
-        .alu_result_out(alu_result_reg),
-        .rd_write_back_2(rd_write_back_2),
-        .rd_wb_value_2(rd_wb_value_2)
-    );
-    
-/*--------Block Components--------*/
+    output [31:0]   trace_instruction,
+                    trace_rd_value 
+);
+
     cc_counter ccc(
-        .rst_n(rst_n),
-        .clk(clk),
-        .cc_count(/*----TODO----*/)
+        // Inputs
+        .clk            (clk),
+        .rst_n          (rst_n),
+        // Outputs
+        .cc_count       (/*----TODO----*/)
     );
     
     program_counter pc(
-        .clk(clk),
-        .rst_n(rst_n),
-        .program_count(imem_addr)
+        // Inputs
+        .clk            (clk),
+        .rst_n          (rst_n),
+        // Outputs
+        .program_count  (imem_addr)
+    );
+
+/*----------------Instruction Fetch----------------*/
+
+    wire [31:0] IF_ins;
+
+    pipeline_reg_instruction pri(
+        // Inputs
+        .clk            (clk),
+        .instr          (imem_insn),
+        // Outputs
+        .IF_ins         (IF_ins),
+        // Traces
+        .TRACE_ins      (trace_instruction)
     );
     
+/*----------------Instruction Decode----------------*/
+
+    wire DCR_wr_en, DCR_mem_en, DCR_mem_wr, DCR_imm_sel;
+    wire [2:0] DCR_fn_3;
+    wire [4:0] DCR_rd_sel, DCR_rs1_sel, DCR_rs2_sel;
+    wire [6:0] DCR_fn_7, DCR_opcode;
+    wire [11:0] DCR_imm_val;
+
+    wire [4:0] RAW_rs1_sel, RAW_rs2_sel;
+    wire [31:0] RAW_rs1_val, RAW_rs2_val;
+
     decoder dcr(
-        .instruction(instruction_reg),
-        .funct3_out(funct3),
-        .funct7_out(funct7),
-        .rd_sel_out(rd_sel),
-        .rs1_sel_out(rs1_sel),
-        .rs2_sel_out(rs2_sel),
-        .imm_value_out(imm_value),
-        .opcode_out(opcode),
-        .imm_sel_out(imm_sel),
-        .write_enable_out(write_enable)
+        // Inputs
+        .IF_ins         (IF_ins),
+        // Outputs
+        .DCR_wr_en       (DCR_wr_en),
+        .DCR_mem_en      (DCR_mem_en),
+        .DCR_mem_wr      (DCR_mem_wr),
+        .DCR_imm_sel     (DCR_imm_sel),
+        .DCR_fn_3        (DCR_fn_3),
+        .DCR_rd_sel      (DCR_rd_sel),
+        .DCR_rs1_sel     (DCR_rs1_sel),
+        .DCR_rs2_sel     (DCR_rs2_sel),
+        .DCR_fn_7        (DCR_fn_7),
+        .DCR_opcode      (DCR_opcode),
+        .DCR_imm_val     (DCR_imm_val)
     );
+
+    wire [31:0] MUX_mux_val;
     
     mux_alu mux(
-        .imm_sel_in(imm_sel),
-        .imm_value_in(imm_value),
-        .rs2_value_in(raw_rs2_value),
-        .mux_result_out(mux_result),
-        
-        /*----Trace Debugging----*/
-        .trace_imm(trace_imm)
+        // Inputs
+        .DCR_imm_sel     (DCR_imm_sel),
+        .DCR_imm_val     (DCR_imm_val),
+        .RAW_rs2_val     (RAW_rs2_val),
+        // Outputs
+        .MUX_mux_val     (MUX_mux_val),
+        // Traces
+        .TRACE_imm_val  (trace_imm)
+    );    
+    
+    wire ID_wr_en, ID_mem_en, ID_mem_wr;
+    wire [2:0] ID_fn_3;
+    wire [4:0] ID_rd_sel;
+    wire [6:0] ID_opcode, ID_fn_7;
+    wire [31:0] ID_rs1_val, ID_mux_val;
+    
+    pipeline_reg_decoder prd(
+        // Inputs
+        .clk            (clk),
+        .IF_wr_en       (DCR_wr_en),
+        .IF_mem_en      (DCR_mem_en),
+        .IF_mem_wr      (DCR_mem_wr),
+        .IF_fn_3        (DCR_fn_3),
+        .IF_rd_sel      (DCR_rd_sel),
+        .IF_opcode      (DCR_opcode),
+        .IF_fn_7        (DCR_fn_7),
+        .IF_rs1_val     (RAW_rs1_val),
+        .IF_mux_val     (MUX_mux_val),
+        // Outputs
+        .ID_wr_en       (ID_wr_en),
+        .ID_mem_en      (ID_mem_en),
+        .ID_mem_wr      (ID_mem_wr),
+        .ID_fn_3        (ID_fn_3),
+        .ID_rd_sel      (ID_rd_sel),
+        .ID_opcode      (ID_opcode),
+        .ID_fn_7        (ID_fn_7),
+        .ID_rs1_val     (ID_rs1_val),
+        .ID_mux_val     (ID_mux_val)
     );
     
+/*----------------Execute----------------*/
+
+    wire [31:0] ALU_alu_val;
+
     alu alu(
-        .opcode_in(opcode_reg),
-        .funct3_in(funct3_reg),
-        .funct7_in(funct7_reg),
-        .rs1_value_in(rs1_value_reg),
-        .mux_result_in(mux_result_reg),
-        .alu_result_out(alu_result),
-        .raw_output(rd_wb_value)
+        // Inputs
+        .ID_fn_3        (ID_fn_3),
+        .ID_opcode      (ID_opcode),
+        .ID_fn_7        (ID_fn_7),
+        .ID_rs1_val     (ID_rs1_val),
+        .ID_mux_val     (ID_mux_val),
+        // Outputs
+        .ALU_alu_val    (ALU_alu_val)
+    );    
+    
+    wire EX_wr_en, EX_mem_en, EX_mem_wr;
+    wire [4:0] EX_rd_sel, EX_raw_sel;
+    wire [31:0] EX_alu_val, EX_raw_val;
+    
+    pipeline_reg_alu pra(
+        // Inputs
+        .clk            (clk),
+        .ID_wr_en       (ID_wr_en),
+        .ID_mem_en      (ID_mem_en),
+        .ID_mem_wr      (ID_mem_wr),
+        .ID_rd_sel      (ID_rd_sel),
+        .ID_alu_val     (ALU_alu_val),
+        // Outputs
+        .EX_wr_en       (EX_wr_en),
+        .EX_mem_en      (EX_mem_en),
+        .EX_mem_wr      (EX_mem_wr),
+        .EX_rd_sel      (EX_rd_sel),
+        .EX_raw_sel     (EX_raw_sel),
+        .EX_alu_val     (EX_alu_val),
+        .EX_raw_val     (EX_raw_val)
     );
     
-    raw_handler rwh(
-        .clk(clk),
-        .rs1_sel_in(rs1_sel),
-        .rs2_sel_in(rs2_sel),
-        .rd_write_back_in(rd_write_back),
-        .rd_write_back_in_2(rd_write_back_2),
-        .rs1_value_in(rs1_value),
-        .rs2_value_in(rs2_value),
-        .rd_value_in(rd_wb_value),
-        .rd_wb_value_2(rd_wb_value_2),
-        .get_rs1(get_rs1),
-        .get_rs2(get_rs2),
-        .rs1_value_out(raw_rs1_value),
-        .rs2_value_out(raw_rs2_value)
+/*----------------Memory----------------*/
+
+    wire MEM_wr_en;
+    wire [4:0] MEM_rd_sel, MEM_raw_sel;
+    wire [31:0] MEM_alu_val, MEM_raw_val;
+
+    pipeline_reg_memory prm(
+        // Inputs
+        .clk            (clk),
+        .EX_wr_en       (EX_wr_en),
+        .EX_mem_en      (EX_mem_en),
+        .EX_mem_wr      (EX_mem_wr),
+        .EX_rd_sel      (EX_rd_sel),
+        .EX_alu_val     (EX_alu_val),
+        // Outputs
+        .MEM_wr_en      (MEM_wr_en),
+        .MEM_rd_sel     (MEM_rd_sel),
+        .MEM_raw_sel    (MEM_raw_sel),
+        .MEM_alu_val    (MEM_alu_val),
+        .MEM_raw_val    (MEM_raw_val),
+        // In-Outs
+        .dram           (dmem_data)
     );
     
+/*----------------Write Back----------------*/
+
+    wire WB_wr_en;
+    wire [4:0] WB_rd_sel, WB_raw_sel;
+    wire [31:0] WB_rd_val, WB_raw_val;
+
+    pipeline_reg_writeback prw(
+        // Inputs
+        .clk            (clk),
+        .MEM_wr_en      (MEM_wr_en),
+        .MEM_rd_sel     (MEM_rd_sel),
+        .MEM_rd_val     (MEM_alu_val),
+        // Outputs
+        .WB_wr_en       (WB_wr_en),
+        .WB_rd_sel      (WB_rd_sel),
+        .WB_raw_sel     (WB_raw_sel),
+        .WB_rd_val      (WB_rd_val),
+        .WB_raw_val     (WB_raw_val)
+    );            
+
+    wire [31:0] RGF_rs1_val, RGF_rs2_val;
+
     register_file rgf(
+        // Inputs
         .clk(clk),
-        .write_enable_in(write_enable_alu),
-        .rd_sel_in(rd_sel_wb),
-        .rs1_sel_in(get_rs1),
-        .rs2_sel_in(get_rs2),
-        .write_data_in(alu_result_reg),
-        .rs1_value_out(rs1_value),
-        .rs2_value_out(rs2_value),
-        
-        /*----Trace Debugging----*/
-        .trace_rd(trace_rd),
-        .trace_rs1(trace_rs1),
-        .trace_rs2(trace_rs2),
-        .trace_write_in(trace_rd_value) 
+        .WB_wr_en       (WB_wr_en),
+        .WB_rd_sel      (WB_rd_sel),
+        .RAW_rs1_sel    (RAW_rs1_sel),
+        .RAW_rs2_sel    (RAW_rs2_sel),
+        .WB_rd_val      (WB_rd_val),
+        // Outputs
+        .RGF_rs1_val    (RGF_rs1_val),
+        .RGF_rs2_val    (RGF_rs2_val),
+        // Traces
+        .TRACE_rd_sel   (trace_rd),
+        .TRACE_rs1_sel  (trace_rs1),
+        .TRACE_rs2_sel  (trace_rs2),
+        .TRACE_wb_val   (trace_rd_value) 
     );
+
+    raw_handler rwh(
+        // Inputs
+        .DCR_rs1_sel    (DCR_rs1_sel),
+        .DCR_rs2_sel    (DCR_rs2_sel),
+        .EX_raw_sel     (EX_raw_sel),
+        .MEM_raw_sel    (MEM_raw_sel),
+        .WB_raw_sel     (WB_raw_sel),
+        .RGF_rs1_val    (RGF_rs1_val),
+        .RGF_rs2_val    (RGF_rs2_val),
+        .EX_raw_val     (EX_raw_val),
+        .MEM_raw_val    (MEM_raw_val),
+        .WB_raw_val     (WB_raw_val),
+        // Outputs
+        .RAW_rs1_sel    (RAW_rs1_sel),
+        .RAW_rs2_sel    (RAW_rs2_sel),
+        .RAW_rs1_val    (RAW_rs1_val),
+        .RAW_rs2_val    (RAW_rs2_val)
+    );    
 
 endmodule

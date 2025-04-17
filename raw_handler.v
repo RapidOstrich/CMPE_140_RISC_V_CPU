@@ -21,41 +21,42 @@
 
 
 module raw_handler(
-    input clk,
-    input [4:0] rs1_sel_in, rs2_sel_in, rd_write_back_in, rd_write_back_in_2,
-    input [31:0] rs1_value_in, rs2_value_in, rd_value_in, rd_wb_value_2,
-    output reg [4:0] get_rs1, get_rs2,
-    output reg [31:0] rs1_value_out, rs2_value_out    
+    input [4:0]         DCR_rs1_sel,
+                        DCR_rs2_sel,
+                        EX_raw_sel,
+                        MEM_raw_sel,
+                        WB_raw_sel,
+                        
+    input [31:0]        RGF_rs1_val,
+                        RGF_rs2_val,
+                        EX_raw_val,
+                        MEM_raw_val,
+                        WB_raw_val,
+                        
+    output reg [4:0]    RAW_rs1_sel,
+                        RAW_rs2_sel,
+                        
+    output reg [31:0]   RAW_rs1_val,
+                        RAW_rs2_val    
 );
 
     always @(*) begin
     
-        get_rs1 <= rs1_sel_in;
-        get_rs2 <= rs2_sel_in;
-
-        if (rs1_sel_in == rd_write_back_in) begin
-            rs1_value_out <= rd_value_in;
-        end
+        RAW_rs1_sel = DCR_rs1_sel;
+        RAW_rs2_sel = DCR_rs2_sel;
         
-        else if (rs1_sel_in == rd_write_back_in_2) begin
-            rs1_value_out <= rd_wb_value_2;
-        end
+        /*----Precedence of Checking----*/
+        /* EX > MEM > WB > (No data hazard) */
         
-        else begin
-            rs1_value_out <= rs1_value_in;
-        end
+        if      (DCR_rs1_sel == EX_raw_sel)   RAW_rs1_val = EX_raw_val;
+        else if (DCR_rs1_sel == MEM_raw_sel)  RAW_rs1_val = MEM_raw_val;
+        else if (DCR_rs1_sel == WB_raw_sel)   RAW_rs1_val = WB_raw_val;
+        else                                RAW_rs1_val = RGF_rs1_val;
         
-        if (rs2_sel_in == rd_write_back_in) begin
-            rs2_value_out <= rd_value_in;
-        end
-        
-        else if (rs2_sel_in == rd_write_back_in_2) begin
-            rs2_value_out <= rd_wb_value_2;
-        end        
-        
-        else begin
-            rs2_value_out <= rs2_value_in;
-        end
+        if      (DCR_rs2_sel == EX_raw_sel)   RAW_rs2_val = EX_raw_val;
+        else if (DCR_rs2_sel == MEM_raw_sel)  RAW_rs2_val = MEM_raw_val; 
+        else if (DCR_rs2_sel == WB_raw_sel)   RAW_rs2_val = WB_raw_val;
+        else                                RAW_rs2_val = RGF_rs2_val;
 
     end
 

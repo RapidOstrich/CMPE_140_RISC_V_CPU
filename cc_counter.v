@@ -21,28 +21,21 @@
 
 
 module cc_counter(
-    input rst_n, clk,
-    output reg [15:0] cc_count
+    input               rst_n,
+                        clk,
+                        
+    output reg [15:0]   cc_count
 );
-
-    /*----Program Start Flag----*/
     reg prog_start;
     
-    /*----Init Counter & Flag----*/
     initial begin
         cc_count <= 0;
         prog_start <= 0;
     end
     
     always @(posedge clk) begin
-        if (rst_n) begin
-            prog_start <= 1;
-        end
-        // ELSE block?
-
-        if (prog_start) begin
-            cc_count <= cc_count + 1; 
-        end
+        if (rst_n) prog_start <= 1;
+        if (prog_start) cc_count <= cc_count + 1;
     end
     
 endmodule

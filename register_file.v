@@ -21,14 +21,24 @@
 
 
 module register_file(
-    input clk, write_enable_in,
-    input [4:0] rd_sel_in, rs1_sel_in, rs2_sel_in,
-    input [31:0] write_data_in,
-    output reg [31:0] rs1_value_out, rs2_value_out,
+    input               clk,
+                        WB_wr_en,
+                        
+    input [4:0]         WB_rd_sel,
+                        RAW_rs1_sel,
+                        RAW_rs2_sel,
+                        
+    input [31:0]        WB_rd_val,
+    
+    output reg [31:0]   RGF_rs1_val,
+                        RGF_rs2_val,
     
 /*--------Trace Debugging--------*/
-    output reg [4:0] trace_rd, trace_rs1, trace_rs2,
-    output reg [31:0] trace_write_in
+    output reg [4:0]    TRACE_rd_sel,
+                        TRACE_rs1_sel,
+                        TRACE_rs2_sel,
+                        
+    output reg [31:0]   TRACE_wb_val
 );
 
     /*--Register file: 32 registers, each 32 bits wide--*/
@@ -36,21 +46,19 @@ module register_file(
 
     /*--Asynchronous read: Read values based on rs1 and rs2 select inputs--*/
     always @(*) begin
-        rs1_value_out <= (rs1_sel_in == 5'b00000) ? 32'b0 : registers[rs1_sel_in];
-        rs2_value_out <= (rs2_sel_in == 5'b00000) ? 32'b0 : registers[rs2_sel_in];
+        RGF_rs1_val <= (RAW_rs1_sel == 5'b00000) ? 32'b0 : registers[RAW_rs1_sel];
+        RGF_rs2_val <= (RAW_rs2_sel == 5'b00000) ? 32'b0 : registers[RAW_rs2_sel];
     end
 
     /*--Synchronous write: Write data on clock edge if enabled--*/
     always @(posedge clk) begin
-        if (write_enable_in && rd_sel_in != 5'b00000) begin
-            registers[rd_sel_in] <= write_data_in;
-        end   
+        if (WB_wr_en && WB_rd_sel != 5'b00000) registers[WB_rd_sel] <= WB_rd_val;
             
    /*--------Trace Debugging--------*/
-        trace_rd <= rd_sel_in;
-        trace_rs1 <= rs1_sel_in;
-        trace_rs2 <= rs2_sel_in;
-        trace_write_in <= write_data_in;   
+        TRACE_rd_sel    <= WB_rd_sel;
+        TRACE_rs1_sel   <= RAW_rs1_sel;
+        TRACE_rs2_sel   <= RAW_rs2_sel;
+        TRACE_wb_val    <= WB_rd_val;   
         
     end
 

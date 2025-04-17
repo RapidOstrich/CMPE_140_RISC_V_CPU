@@ -4,12 +4,12 @@
 // Engineer: Spenser The
 // 
 // Create Date: 02/20/2025 04:34:50 PM
-// Design Name: RISC-V Instruction Decoder
+// Design Name: RISC-V IF_ins Decoder
 // Module Name: decoder
 // Project Name: CMPE 140 RISC-V Processor
 // Target Devices: NA
 // Tool Versions: NA
-// Description: Decodes the 32-bit instruction into it's respective components.
+// Description: Decodes the 32-bit IF_ins into it's respective components.
 // 
 // Dependencies: NA
 // 
@@ -21,50 +21,72 @@
 
 
 module decoder(
-    input [31:0] instruction,
-    output reg imm_sel_out, write_enable_out,
-    output reg [2:0] funct3_out,
-    output reg [4:0] rd_sel_out, rs1_sel_out, rs2_sel_out,
-    output reg [6:0] funct7_out, opcode_out,
-    output reg [11:0] imm_value_out
+    input [31:0]        IF_ins,
+    
+    output reg          DCR_wr_en,
+                        DCR_mem_en,
+                        DCR_mem_wr,
+                        DCR_imm_sel,
+                        
+    output reg [2:0]    DCR_fn_3,
+    
+    output reg [4:0]    DCR_rd_sel,
+                        DCR_rs1_sel,
+                        DCR_rs2_sel,
+                        
+    output reg [6:0]    DCR_fn_7,
+                        DCR_opcode,
+                        
+    output reg [11:0]   DCR_imm_val
 );
     
     /*--------Switch Cases--------*/
-    localparam  reg_reg         = 7'b0110011,
-                immediate       = 7'b0010011,
-                upper_immediate = 7'b0110111,
-                store           = 7'b0100011,
-                branch          = 7'b1100011,
-                jump            = 7'b1101111;
+    localparam  R_TYPE = 7'b0110011,
+                I_TYPE = 7'b0010011,
+                LOAD   = 7'b0000011;
    
    always @(*) begin
        
         /*----Init Opcode----*/
-        opcode_out <= instruction[6:0];
+        DCR_opcode <= IF_ins[6:0];
         
-        case (opcode_out)
-            /*--[imm 31:20 | rs1 19:15 | funct3 14:12 | rd 11:7 | opcode 6:0]--*/
-            immediate: begin
-                imm_value_out <= instruction[31:20];
-                rs1_sel_out <= instruction[19:15];
-                funct3_out <= instruction[14:12];
-                rd_sel_out <= instruction[11:7];
-                imm_sel_out <= 1;
-                write_enable_out <= 1;             
+        case (DCR_opcode)
+            I_TYPE: begin
+                DCR_wr_en    <= 1; 
+                DCR_mem_en   <= 0;
+                DCR_mem_wr   <= 0;
+                DCR_imm_sel  <= 1;
+                
+                DCR_imm_val  <= IF_ins[31:20];
+                DCR_rs1_sel  <= IF_ins[19:15];
+                DCR_fn_3     <= IF_ins[14:12];
+                DCR_rd_sel   <= IF_ins[11:7];
             end
             
-            reg_reg: begin
-                funct7_out <= instruction[31:25];
-                rs2_sel_out <= instruction[24:20];
-                rs1_sel_out <= instruction[19:15];
-                funct3_out <= instruction[14:12];
-                rd_sel_out <= instruction[11:7];
-                opcode_out <= instruction[6:0];
-                imm_sel_out <= 0;
-                write_enable_out <= 1;
+            R_TYPE: begin
+                DCR_wr_en    <= 1;
+                DCR_mem_en   <= 0;
+                DCR_mem_wr   <= 0;
+                DCR_imm_sel  <= 0;
+                
+                DCR_fn_7     <= IF_ins[31:25];
+                DCR_rs2_sel  <= IF_ins[24:20];
+                DCR_rs1_sel  <= IF_ins[19:15];
+                DCR_fn_3     <= IF_ins[14:12];
+                DCR_rd_sel   <= IF_ins[11:7];
             end
             
-            /*----Remaining Opcodes TODO----*/
+            LOAD: begin
+                DCR_wr_en    <= 1;
+                DCR_mem_en   <= 1;
+                DCR_mem_wr   <= 0;
+                DCR_imm_sel  <= 1;
+                
+                DCR_imm_val  <= IF_ins[31:20];
+                DCR_rs1_sel  <= IF_ins[19:15];
+                DCR_fn_3     <= IF_ins[14:12];
+                DCR_rd_sel   <= IF_ins[11:7];                                
+            end
             
         endcase
         

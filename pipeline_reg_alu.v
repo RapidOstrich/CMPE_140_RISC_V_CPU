@@ -21,21 +21,39 @@
 
 
 module pipeline_reg_alu(
-    input clk,
-    input write_enable_in,
-    input [4:0] rd_sel_in,
-    input [31:0] alu_result_in,
-    output reg write_enable_out,
-    output reg [4:0] rd_sel_out, rd_write_back_2,
-    output reg [31:0] alu_result_out, rd_wb_value_2
+    input               clk,
+                        ID_wr_en,
+                        ID_mem_en,
+                        ID_mem_wr,
+                        
+    input [4:0]         ID_rd_sel,
+    
+    input [31:0]        ID_alu_val,
+    
+    output reg          EX_wr_en,
+                        EX_mem_en,
+                        EX_mem_wr,
+    
+    output reg [4:0]    EX_rd_sel,
+                        EX_raw_sel,
+                        
+    output reg [31:0]   EX_alu_val,
+                        EX_raw_val
 );
 
     always @(posedge clk) begin
-        rd_sel_out <= rd_sel_in;
-        alu_result_out <= alu_result_in;
-        write_enable_out <= write_enable_in;
-        rd_write_back_2 <= rd_sel_in;
-        rd_wb_value_2 <= alu_result_in;                        
+        EX_wr_en    <= ID_wr_en;
+        EX_mem_en   <= ID_mem_en;
+        EX_mem_wr   <= ID_mem_wr;
+        EX_rd_sel   <= ID_rd_sel;
+        EX_alu_val  <= ID_alu_val;
+        //EX_raw_sel  <= ID_rd_sel;
+        //EX_raw_val  <= ID_alu_val;
+    end
+    
+    always @(*) begin
+        EX_raw_sel  <= ID_rd_sel;
+        EX_raw_val  <= ID_alu_val;        
     end
 
 endmodule

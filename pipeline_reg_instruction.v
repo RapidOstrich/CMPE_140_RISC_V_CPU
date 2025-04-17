@@ -21,19 +21,21 @@
 
 
 module pipeline_reg_instruction(
-    input clk,
-    input [31:0] instruction_in,
-    output reg [31:0] instruction_out,
+    input               clk,
+    
+    input [31:0]        instr,
+    
+    output reg [31:0]   IF_ins,
     
 /*--------Trace Debugging--------*/    
-    output reg [31:0] trace_instruction
+    output reg [31:0]   TRACE_ins
 );
 
     always @(posedge clk) begin
-        instruction_out <= instruction_in;
+        IF_ins <= instr;
         
         /*----Trace Debugging----*/
-        trace_instruction <= instruction_in;
+        TRACE_ins <= instr;
     end
 
 endmodule

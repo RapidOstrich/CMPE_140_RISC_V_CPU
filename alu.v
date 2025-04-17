@@ -21,61 +21,65 @@
 
 
 module alu(
-    input [2:0] funct3_in,    
-    input [6:0] opcode_in, funct7_in,
-    input [31:0] rs1_value_in, mux_result_in,    
-    output reg [31:0] alu_result_out, raw_output
+    input [2:0]         ID_fn_3,
+        
+    input [6:0]         ID_opcode,
+                        ID_fn_7,
+    
+    input [31:0]        ID_rs1_val,
+                        ID_mux_val,
+                            
+    output reg [31:0]   ALU_alu_val
 );
     
     /*----Switch Cases----*/
-    localparam  reg_reg     = 7'b0110011,
-                immediate   = 7'b0010011;
+    localparam  R_TYPE = 7'b0110011,
+                I_TYPE = 7'b0010011,
+                LOAD   = 7'b0000011;
                                 
     always @(*) begin
-        case (opcode_in)
+        case (ID_opcode)
             
-            immediate: begin
-                case (funct3_in)
-                    3'b000: alu_result_out <= rs1_value_in + mux_result_in;
-                    3'b001: alu_result_out <= rs1_value_in << mux_result_in[4:0];
-                    3'b010: alu_result_out <= ($signed(rs1_value_in) < $signed(mux_result_in)) ? 1 : 0;
-                    3'b011: alu_result_out <= (rs1_value_in < mux_result_in) ? 1 : 0;
-                    3'b100: alu_result_out <= rs1_value_in ^ mux_result_in;
+            I_TYPE: begin
+                case (ID_fn_3)
+                    3'b000: ALU_alu_val = ID_rs1_val + ID_mux_val;
+                    3'b001: ALU_alu_val = ID_rs1_val << ID_mux_val[4:0];
+                    3'b010: ALU_alu_val = ($signed(ID_rs1_val) < $signed(ID_mux_val)) ? 1 : 0;
+                    3'b011: ALU_alu_val = (ID_rs1_val < ID_mux_val) ? 1 : 0;
+                    3'b100: ALU_alu_val = ID_rs1_val ^ ID_mux_val;
                     3'b101: begin
-                        if (mux_result_in[11:5] == 0) alu_result_out <= rs1_value_in >> mux_result_in[4:0];
-                        else alu_result_out <= $signed(rs1_value_in) >>> mux_result_in[4:0];
+                        if (ID_mux_val[11:5] == 0) ALU_alu_val = ID_rs1_val >> ID_mux_val[4:0];
+                        else ALU_alu_val = $signed(ID_rs1_val) >>> ID_mux_val[4:0];
                     end
-                    3'b110: alu_result_out <= rs1_value_in | mux_result_in;
-                    3'b111: alu_result_out <= rs1_value_in & mux_result_in;          
+                    3'b110: ALU_alu_val = ID_rs1_val | ID_mux_val;
+                    3'b111: ALU_alu_val = ID_rs1_val & ID_mux_val;          
                 endcase
             end
             
-            reg_reg: begin
-                case (funct3_in)
+            R_TYPE: begin
+                case (ID_fn_3)
                     3'b000: begin
-                        if (funct7_in == 0) alu_result_out <= rs1_value_in + mux_result_in;
-                        else alu_result_out <= rs1_value_in - mux_result_in;
+                        if (ID_fn_7 == 0) ALU_alu_val = ID_rs1_val + ID_mux_val;
+                        else ALU_alu_val = ID_rs1_val - ID_mux_val;
                     end
-                    3'b001: alu_result_out <= rs1_value_in << mux_result_in[4:0];
-                    3'b010: alu_result_out <= ($signed(rs1_value_in) < $signed(mux_result_in)) ? 1 : 0;
-                    3'b011: alu_result_out <= (rs1_value_in < mux_result_in) ? 1 : 0;
-                    3'b100: alu_result_out <= rs1_value_in ^ mux_result_in;
+                    3'b001: ALU_alu_val = ID_rs1_val << ID_mux_val[4:0];
+                    3'b010: ALU_alu_val = ($signed(ID_rs1_val) < $signed(ID_mux_val)) ? 1 : 0;
+                    3'b011: ALU_alu_val = (ID_rs1_val < ID_mux_val) ? 1 : 0;
+                    3'b100: ALU_alu_val = ID_rs1_val ^ ID_mux_val;
                     3'b101: begin
-                        if (funct7_in == 0) alu_result_out <= rs1_value_in >> mux_result_in[4:0];
-                        else alu_result_out <= $signed(rs1_value_in) >> $signed(mux_result_in[4:0]);
+                        if (ID_fn_7 == 0) ALU_alu_val = ID_rs1_val >> ID_mux_val[4:0];
+                        else ALU_alu_val = $signed(ID_rs1_val) >> $signed(ID_mux_val[4:0]);
                     end
-                    3'b110: alu_result_out <= rs1_value_in | mux_result_in;
-                    3'b111: alu_result_out <= rs1_value_in & mux_result_in;
+                    3'b110: ALU_alu_val = ID_rs1_val | ID_mux_val;
+                    3'b111: ALU_alu_val = ID_rs1_val & ID_mux_val;
                 endcase             
             end
               
-            default: begin
-                /*----TODO----*/
+            LOAD: begin
+                ALU_alu_val = ID_rs1_val + ID_mux_val[11:0];
             end
             
         endcase
-        
-        raw_output <= alu_result_out;
           
     end        
     

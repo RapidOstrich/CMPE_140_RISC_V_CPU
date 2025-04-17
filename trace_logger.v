@@ -54,14 +54,15 @@ module trace_logger(
     always @(posedge clk) begin
         if (rst_n) begin                   
             $display("%h \t | \t x%d \t | \t x%d \t | \t x%d \t | %d \t |  %d", trace_instruction, trace_rd, trace_rs1, trace_rs2, trace_imm, trace_rd_value);
+            //$display("%h | x%d | x%d | x%d | %d | %d", trace_instruction, trace_rd, trace_rs1, trace_rs2, trace_imm, trace_rd_value);            
         end
     end
-    
+    /*
     always @(posedge clk) begin    
         if (fd_1 != 0 && fd_2 != 0) begin              
            $fwrite(fd_1, "Instruction: %h\n", trace_instruction);
            $fwrite(fd_2, "Register: %b, Write-in value: %d\n", trace_rd, trace_rd_value);            
         end 
     end
-    
+    */
 endmodule

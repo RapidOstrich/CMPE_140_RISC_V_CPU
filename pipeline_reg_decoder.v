@@ -21,28 +21,47 @@
 
 
 module pipeline_reg_decoder(
-    input clk,
-    input write_enable_in,
-    input [31:0] mux_result_in, rs1_value_in,
-    input [6:0] opcode_in, funct7_in,
-    input [4:0] rd_sel_in,
-    input [2:0] funct3_in,
-    output reg write_enable_out,
-    output reg [31:0] mux_result_out, rs1_value_out,
-    output reg [6:0] opcode_out, funct7_out,
-    output reg [4:0] rd_sel_out, raw_rd,
-    output reg [2:0] funct3_out
+    input               clk,
+                        IF_wr_en,
+                        IF_mem_en,
+                        IF_mem_wr,
+                        
+    input [2:0]         IF_fn_3,
+    
+    input [4:0]         IF_rd_sel,
+    
+    input [6:0]         IF_opcode,
+                        IF_fn_7,
+                        
+    input [31:0]        IF_rs1_val,
+                        IF_mux_val,
+                        
+    output reg          ID_wr_en,
+                        ID_mem_en,
+                        ID_mem_wr,
+    
+    output reg [2:0]    ID_fn_3,
+    
+    output reg [4:0]    ID_rd_sel,
+                        
+    output reg [6:0]    ID_opcode,
+                        ID_fn_7,
+                        
+    output reg [31:0]   ID_rs1_val,
+                        ID_mux_val
+
 );
     
     always @(posedge clk) begin
-        write_enable_out <= write_enable_in;
-        mux_result_out <= mux_result_in;
-        rs1_value_out <= rs1_value_in;
-        opcode_out <= opcode_in;
-        funct7_out <= funct7_in;
-        rd_sel_out <= rd_sel_in;
-        funct3_out <= funct3_in;
-        raw_rd <= rd_sel_in;  
+        ID_wr_en    <= IF_wr_en;
+        ID_mem_en   <= IF_mem_en;
+        ID_mem_wr   <= IF_mem_wr;
+        ID_fn_3     <= IF_fn_3;
+        ID_rd_sel   <= IF_rd_sel;
+        ID_opcode   <= IF_opcode;
+        ID_fn_7     <= IF_fn_7;
+        ID_rs1_val  <= IF_rs1_val;
+        ID_mux_val  <= IF_mux_val;
     end
 
 endmodule
