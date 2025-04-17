@@ -50,8 +50,20 @@ module decoder(
                 funct3_out <= instruction[14:12];
                 rd_sel_out <= instruction[11:7];
                 imm_sel_out <= 1;
-                write_enable_out <= 1;              
+                write_enable_out <= 1;             
             end
+            
+            reg_reg: begin
+                funct7_out <= instruction[31:25];
+                rs2_sel_out <= instruction[24:20];
+                rs1_sel_out <= instruction[19:15];
+                funct3_out <= instruction[14:12];
+                rd_sel_out <= instruction[11:7];
+                opcode_out <= instruction[6:0];
+                imm_sel_out <= 0;
+                write_enable_out <= 1;
+            end
+            
             /*----Remaining Opcodes TODO----*/
             
         endcase
