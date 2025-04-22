@@ -48,15 +48,15 @@ module raw_handler(
         /*----Precedence of Checking----*/
         /* EX > MEM > WB > (No data hazard) */
         
-        if      (DCR_rs1_sel == EX_raw_sel)   RAW_rs1_val = EX_raw_val;
-        else if (DCR_rs1_sel == MEM_raw_sel)  RAW_rs1_val = MEM_raw_val;
-        else if (DCR_rs1_sel == WB_raw_sel)   RAW_rs1_val = WB_raw_val;
-        else                                RAW_rs1_val = RGF_rs1_val;
+        if      (DCR_rs1_sel == EX_raw_sel)     RAW_rs1_val = EX_raw_val;
+        else if (DCR_rs1_sel == MEM_raw_sel)    RAW_rs1_val = MEM_raw_val;
+        else if (DCR_rs1_sel == WB_raw_sel)     RAW_rs1_val = WB_raw_val;
+        else                                    RAW_rs1_val = RGF_rs1_val;
         
-        if      (DCR_rs2_sel == EX_raw_sel)   RAW_rs2_val = EX_raw_val;
-        else if (DCR_rs2_sel == MEM_raw_sel)  RAW_rs2_val = MEM_raw_val; 
-        else if (DCR_rs2_sel == WB_raw_sel)   RAW_rs2_val = WB_raw_val;
-        else                                RAW_rs2_val = RGF_rs2_val;
+        if      (DCR_rs2_sel == EX_raw_sel)     RAW_rs2_val = EX_raw_val;
+        else if (DCR_rs2_sel == MEM_raw_sel)    RAW_rs2_val = MEM_raw_val; 
+        else if (DCR_rs2_sel == WB_raw_sel)     RAW_rs2_val = WB_raw_val;
+        else                                    RAW_rs2_val = RGF_rs2_val;
 
     end
 

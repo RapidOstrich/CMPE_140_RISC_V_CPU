@@ -59,7 +59,7 @@ module alu(
             R_TYPE: begin
                 case (ID_fn_3)
                     3'b000: begin
-                        if (ID_fn_7 == 0) ALU_alu_val = ID_rs1_val + ID_mux_val;
+                        if (ID_fn_7 == 7'b0000000) ALU_alu_val = ID_rs1_val + ID_mux_val;
                         else ALU_alu_val = ID_rs1_val - ID_mux_val;
                     end
                     3'b001: ALU_alu_val = ID_rs1_val << ID_mux_val[4:0];
@@ -67,8 +67,9 @@ module alu(
                     3'b011: ALU_alu_val = (ID_rs1_val < ID_mux_val) ? 1 : 0;
                     3'b100: ALU_alu_val = ID_rs1_val ^ ID_mux_val;
                     3'b101: begin
-                        if (ID_fn_7 == 0) ALU_alu_val = ID_rs1_val >> ID_mux_val[4:0];
-                        else ALU_alu_val = $signed(ID_rs1_val) >> $signed(ID_mux_val[4:0]);
+                        if (ID_fn_7 == 7'b0000000) ALU_alu_val = ID_rs1_val >> $unsigned(ID_mux_val[4:0]);
+                        //if (ID_fn_7 == 7'b0000000) ALU_alu_val = 32'd7;
+                        else ALU_alu_val = $signed(ID_rs1_val) >>> $unsigned(ID_mux_val[4:0]);
                     end
                     3'b110: ALU_alu_val = ID_rs1_val | ID_mux_val;
                     3'b111: ALU_alu_val = ID_rs1_val & ID_mux_val;
