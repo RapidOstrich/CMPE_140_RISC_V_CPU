@@ -24,12 +24,14 @@
 module program_counter(
     input               clk,
                         rst_n,
+                        stall,
                         
     output reg [31:0]   program_count
 );
 
     always @(posedge clk) begin
         if (!rst_n) program_count <= 0;
+        else if (stall) program_count <= program_count;
         else program_count <= program_count + 4;
     end
 

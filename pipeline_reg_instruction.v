@@ -22,6 +22,7 @@
 
 module pipeline_reg_instruction(
     input               clk,
+                        stall,
     
     input [31:0]        instr,
     
@@ -32,7 +33,8 @@ module pipeline_reg_instruction(
 );
 
     always @(posedge clk) begin
-        IF_ins <= instr;
+        if (stall) IF_ins <= IF_ins;
+        else IF_ins <= instr;
         
         /*----Trace Debugging----*/
         TRACE_ins <= instr;

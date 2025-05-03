@@ -27,15 +27,20 @@ module mux_alu(
     
     input [31:0]    RAW_rs2_val,
     
-    output [31:0]   MUX_mux_val,
+    output reg [31:0]   MUX_mux_val,
     
 /*--------Trace Debugging--------*/
-    output [11:0]   TRACE_imm_val   
+    output reg [11:0]   TRACE_imm_val   
 );
 
-    assign MUX_mux_val = (DCR_imm_sel) ? {{20{DCR_imm_val[11]}}, DCR_imm_val} : RAW_rs2_val;
+    always @(*) begin
+        MUX_mux_val <= (DCR_imm_sel) ? {{20{DCR_imm_val[11]}}, DCR_imm_val} : RAW_rs2_val;
+        TRACE_imm_val <= DCR_imm_val;
+    end
+        
+    //assign MUX_mux_val = (DCR_imm_sel) ? {{20{DCR_imm_val[11]}}, DCR_imm_val} : RAW_rs2_val;
     
     /*--------Trace Debugging--------*/
-    assign TRACE_imm_val = DCR_imm_val;
+    //assign TRACE_imm_val = DCR_imm_val;
     
 endmodule

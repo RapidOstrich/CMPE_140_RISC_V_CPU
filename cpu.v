@@ -52,6 +52,7 @@ module cpu(
     output [31:0]   trace_instruction,
                     trace_rd_value 
 );
+    wire stall, ID_stall, EX_stall, MEM_stall;
 
     cc_counter ccc(
         // Inputs
@@ -65,6 +66,7 @@ module cpu(
         // Inputs
         .clk            (clk),
         .rst_n          (rst_n),
+        .stall          (stall),
         // Outputs
         .program_count  (imem_addr)
     );
@@ -76,6 +78,7 @@ module cpu(
     pipeline_reg_instruction pri(
         // Inputs
         .clk            (clk),
+        .stall          (stall),
         .instr          (imem_insn),
         // Outputs
         .IF_ins         (IF_ins),
@@ -128,7 +131,7 @@ module cpu(
     wire [2:0] ID_fn_3;
     wire [4:0] ID_rd_sel;
     wire [6:0] ID_opcode, ID_fn_7;
-    wire [31:0] ID_rs1_val, ID_mux_val;
+    wire [31:0] ID_rs1_val, ID_mux_val, ID_rs2_val;
     
     pipeline_reg_decoder prd(
         // Inputs
@@ -146,12 +149,14 @@ module cpu(
         .ID_wr_en       (ID_wr_en),
         .ID_mem_en      (ID_mem_en),
         .ID_mem_wr      (ID_mem_wr),
+        .ID_stall       (ID_stall),
         .ID_fn_3        (ID_fn_3),
         .ID_rd_sel      (ID_rd_sel),
         .ID_opcode      (ID_opcode),
         .ID_fn_7        (ID_fn_7),
         .ID_rs1_val     (ID_rs1_val),
-        .ID_mux_val     (ID_mux_val)
+        .ID_mux_val     (ID_mux_val),
+        .ID_rs2_val     (ID_rs2_val)
     );
     
 /*----------------Execute----------------*/
@@ -179,12 +184,15 @@ module cpu(
         .ID_wr_en       (ID_wr_en),
         .ID_mem_en      (ID_mem_en),
         .ID_mem_wr      (ID_mem_wr),
+        .ID_stall       (ID_stall),
         .ID_rd_sel      (ID_rd_sel),
         .ID_alu_val     (ALU_alu_val),
+        .ID_rs2_val     (ID_rs2_val),
         // Outputs
         .EX_wr_en       (EX_wr_en),
         .EX_mem_en      (EX_mem_en),
         .EX_mem_wr      (EX_mem_wr),
+        .EX_stall       (EX_stall),
         .EX_rd_sel      (EX_rd_sel),
         .EX_raw_sel     (EX_raw_sel),
         .EX_alu_val     (EX_alu_val),
@@ -203,10 +211,12 @@ module cpu(
         .EX_wr_en       (EX_wr_en),
         .EX_mem_en      (EX_mem_en),
         .EX_mem_wr      (EX_mem_wr),
+        .EX_stall       (EX_stall),
         .EX_rd_sel      (EX_rd_sel),
         .EX_alu_val     (EX_alu_val),
         // Outputs
         .MEM_wr_en      (MEM_wr_en),
+        .MEM_stall      (MEM_stall),
         .MEM_rd_sel     (MEM_rd_sel),
         .MEM_raw_sel    (MEM_raw_sel),
         .MEM_alu_val    (MEM_alu_val),
@@ -217,34 +227,35 @@ module cpu(
     
 /*----------------Write Back----------------*/
 
-    wire WB_wr_en;
-    wire [4:0] WB_rd_sel, WB_raw_sel;
-    wire [31:0] WB_rd_val, WB_raw_val;
-
+    //wire WB_wr_en;
+    //wire [4:0] WB_rd_sel, WB_raw_sel;
+    //wire [31:0] WB_rd_val, WB_raw_val;
+    
+    /*
     pipeline_reg_writeback prw(
         // Inputs
-        .clk            (clk),
-        .MEM_wr_en      (MEM_wr_en),
-        .MEM_rd_sel     (MEM_rd_sel),
-        .MEM_rd_val     (MEM_alu_val),
+        .clk            (),
+        .MEM_wr_en      (),
+        .MEM_rd_sel     (),
+        .MEM_rd_val     (),
         // Outputs
-        .WB_wr_en       (WB_wr_en),
-        .WB_rd_sel      (WB_rd_sel),
-        .WB_raw_sel     (WB_raw_sel),
-        .WB_rd_val      (WB_rd_val),
-        .WB_raw_val     (WB_raw_val)
+        .WB_wr_en       (),
+        .WB_rd_sel      (),
+        .WB_raw_sel     (),
+        .WB_rd_val      (),
+        .WB_raw_val     ()
     );            
-
+    */
     wire [31:0] RGF_rs1_val, RGF_rs2_val;
 
     register_file rgf(
         // Inputs
         .clk(clk),
-        .WB_wr_en       (WB_wr_en),
-        .WB_rd_sel      (WB_rd_sel),
+        .WB_wr_en       (MEM_wr_en),
+        .WB_rd_sel      (MEM_rd_sel),
         .RAW_rs1_sel    (RAW_rs1_sel),
         .RAW_rs2_sel    (RAW_rs2_sel),
-        .WB_rd_val      (WB_rd_val),
+        .WB_rd_val      (MEM_alu_val),
         // Outputs
         .RGF_rs1_val    (RGF_rs1_val),
         .RGF_rs2_val    (RGF_rs2_val),
@@ -257,21 +268,25 @@ module cpu(
 
     raw_handler rwh(
         // Inputs
+        .clk            (clk),
+        .EX_stall       (EX_stall),
+        .MEM_stall      (MEM_stall),
         .DCR_rs1_sel    (DCR_rs1_sel),
         .DCR_rs2_sel    (DCR_rs2_sel),
         .EX_raw_sel     (EX_raw_sel),
         .MEM_raw_sel    (MEM_raw_sel),
-        .WB_raw_sel     (WB_raw_sel),
+        //.WB_raw_sel     (WB_raw_sel),
         .RGF_rs1_val    (RGF_rs1_val),
         .RGF_rs2_val    (RGF_rs2_val),
         .EX_raw_val     (EX_raw_val),
         .MEM_raw_val    (MEM_raw_val),
-        .WB_raw_val     (WB_raw_val),
+        //.WB_raw_val     (WB_raw_val),
         // Outputs
         .RAW_rs1_sel    (RAW_rs1_sel),
         .RAW_rs2_sel    (RAW_rs2_sel),
         .RAW_rs1_val    (RAW_rs1_val),
-        .RAW_rs2_val    (RAW_rs2_val)
+        .RAW_rs2_val    (RAW_rs2_val),
+        .stall          (stall)
     );    
 
 endmodule

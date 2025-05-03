@@ -25,12 +25,14 @@ module pipeline_reg_memory(
                         EX_wr_en,
                         EX_mem_en,
                         EX_mem_wr,
+                        EX_stall,
             
     input [4:0]         EX_rd_sel,
     
     input [31:0]        EX_alu_val,   
 
     output reg          MEM_wr_en,
+                        MEM_stall,
     
     output reg [4:0]    MEM_rd_sel,
                         MEM_raw_sel,
@@ -43,25 +45,25 @@ module pipeline_reg_memory(
 
     always @(posedge clk) begin      
         MEM_wr_en   <= EX_wr_en;
+        MEM_stall   <= EX_stall;
+        //MEM_raw_sel <= EX_rd_sel;
         MEM_rd_sel  <= EX_rd_sel;
         MEM_alu_val <= EX_alu_val;
-        //MEM_raw_sel <= EX_rd_sel;
+        
         /*
-        if (EX_mem_en && !EX_mem_wr) begin
-            MEM_alu_val <= dram[EX_alu_val];
-            MEM_raw_val <= dram[EX_alu_val];
-        end     
-        //else if (EX_mem_en && EX_mem_wr) dram[EX_alu_val] <= ????????
-        else begin
-            MEM_alu_val <= EX_alu_val;
-            MEM_raw_val <= EX_alu_val;
-        end
+        if (EX_mem_en && !EX_mem_wr) MEM_alu_val <= dram[EX_alu_val];     
+        else if (EX_mem_en && EX_mem_wr) dram[EX_alu_val] <= EX_rs2_val;
+        else MEM_alu_val <= EX_alu_val;
         */           
     end
     
     always @(*) begin       
         MEM_raw_sel <= EX_rd_sel;
-        MEM_raw_val <= EX_alu_val;        
+        MEM_raw_val <= EX_alu_val;
+        /*
+        if (EX_mem_en && !EX_mem_wr) MEM_raw_val <= dram[EX_alu_val];
+        else MEM_raw_val <= EX_alu_val;
+        */   
     end    
 
 endmodule

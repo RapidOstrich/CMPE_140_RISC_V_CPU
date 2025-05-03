@@ -7,7 +7,7 @@ CPU Block Components:
   4. Register File
   5. Pipeline Registers
 
-4 Stages: Fetch --> Decode --> Memory --> Execute --> Write Back
+4 Stages: Fetch --> Decode --> Execute --> Write Back
 
 Data flow:
   1. 32-bit instruction is passed to CPU; Instruction is stored in pipeline register.

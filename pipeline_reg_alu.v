@@ -25,14 +25,17 @@ module pipeline_reg_alu(
                         ID_wr_en,
                         ID_mem_en,
                         ID_mem_wr,
+                        ID_stall,
                         
     input [4:0]         ID_rd_sel,
     
     input [31:0]        ID_alu_val,
+                        ID_rs2_val,
     
     output reg          EX_wr_en,
                         EX_mem_en,
                         EX_mem_wr,
+                        EX_stall,
     
     output reg [4:0]    EX_rd_sel,
                         EX_raw_sel,
@@ -48,7 +51,7 @@ module pipeline_reg_alu(
         EX_rd_sel   <= ID_rd_sel;
         EX_alu_val  <= ID_alu_val;
         //EX_raw_sel  <= ID_rd_sel;
-        //EX_raw_val  <= ID_alu_val;
+        EX_stall    <= ID_stall;
     end
     
     always @(*) begin

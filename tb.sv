@@ -46,6 +46,7 @@ module tb();
     wire [word_size - 1:0]      imem_insn;
     wire [address_size - 1:0]   dmem_addr;
     wire [word_size - 1:0]      dmem_data;
+    wire [3:0] byte_en;
     wire dmem_wen;
     
 /*--------Trace Debugging--------*/
@@ -74,6 +75,7 @@ module tb();
         //.init_file("addi_nohazard-1.dat")
         //.init_file("addi_hazards.dat")
         .init_file("r_type.dat")
+        //.init_file("ldst.dat")
     )
     imem(
         .addr(imem_addr),

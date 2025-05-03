@@ -25,6 +25,7 @@ module pipeline_reg_decoder(
                         IF_wr_en,
                         IF_mem_en,
                         IF_mem_wr,
+                        stall,
                         
     input [2:0]         IF_fn_3,
     
@@ -39,6 +40,7 @@ module pipeline_reg_decoder(
     output reg          ID_wr_en,
                         ID_mem_en,
                         ID_mem_wr,
+                        ID_stall,
     
     output reg [2:0]    ID_fn_3,
     
@@ -48,20 +50,41 @@ module pipeline_reg_decoder(
                         ID_fn_7,
                         
     output reg [31:0]   ID_rs1_val,
-                        ID_mux_val
+                        ID_mux_val,
+                        ID_rs2_val
 
 );
     
     always @(posedge clk) begin
-        ID_wr_en    <= IF_wr_en;
-        ID_mem_en   <= IF_mem_en;
-        ID_mem_wr   <= IF_mem_wr;
-        ID_fn_3     <= IF_fn_3;
-        ID_rd_sel   <= IF_rd_sel;
-        ID_opcode   <= IF_opcode;
-        ID_fn_7     <= IF_fn_7;
-        ID_rs1_val  <= IF_rs1_val;
-        ID_mux_val  <= IF_mux_val;
+        if (!stall) begin
+            ID_wr_en    <= IF_wr_en;
+            ID_mem_en   <= IF_mem_en;
+            ID_mem_wr   <= IF_mem_wr;
+            ID_fn_3     <= IF_fn_3;
+            ID_rd_sel   <= IF_rd_sel;
+            ID_opcode   <= IF_opcode;
+            ID_fn_7     <= IF_fn_7;
+            ID_rs1_val  <= IF_rs1_val;
+            ID_mux_val  <= IF_mux_val;
+            ID_rs2_val  <= IF_mux_val;
+            
+            ID_stall    <= 0;
+        end
+        
+        else begin
+            ID_wr_en    <= 0;
+            ID_mem_en   <= 0;
+            ID_mem_wr   <= 0;
+            ID_fn_3     <= 0;
+            ID_rd_sel   <= 0;
+            ID_opcode   <= 0;
+            ID_fn_7     <= 0;
+            ID_rs1_val  <= 0;
+            ID_mux_val  <= 0;
+            ID_rs2_val  <= 0;
+            
+            ID_stall    <= 1;        
+        end            
     end
 
 endmodule

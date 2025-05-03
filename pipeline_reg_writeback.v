@@ -41,7 +41,7 @@ module pipeline_reg_writeback(
         WB_wr_en    <= MEM_wr_en;
         WB_rd_sel   <= MEM_rd_sel;
         WB_rd_val   <= MEM_rd_val;
-        //WB_raw_sel  <= MEM_rd_sel;
+       // WB_raw_sel  <= MEM_rd_sel;
         //WB_raw_val  <= MEM_rd_val;
     end
     

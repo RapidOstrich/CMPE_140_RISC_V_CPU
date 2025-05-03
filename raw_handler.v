@@ -21,17 +21,23 @@
 
 
 module raw_handler(
+    input               clk,
+                        EX_stall,
+                        MEM_stall,
+
     input [4:0]         DCR_rs1_sel,
                         DCR_rs2_sel,
                         EX_raw_sel,
                         MEM_raw_sel,
-                        WB_raw_sel,
+                        //WB_raw_sel,
                         
     input [31:0]        RGF_rs1_val,
                         RGF_rs2_val,
                         EX_raw_val,
                         MEM_raw_val,
-                        WB_raw_val,
+                        //WB_raw_val,
+                        
+    output reg          stall,                        
                         
     output reg [4:0]    RAW_rs1_sel,
                         RAW_rs2_sel,
@@ -42,21 +48,41 @@ module raw_handler(
 
     always @(*) begin
     
-        RAW_rs1_sel = DCR_rs1_sel;
-        RAW_rs2_sel = DCR_rs2_sel;
+        RAW_rs1_sel <= DCR_rs1_sel;
+        RAW_rs2_sel <= DCR_rs2_sel;
         
         /*----Precedence of Checking----*/
         /* EX > MEM > WB > (No data hazard) */
         
-        if      (DCR_rs1_sel == EX_raw_sel)     RAW_rs1_val = EX_raw_val;
-        else if (DCR_rs1_sel == MEM_raw_sel)    RAW_rs1_val = MEM_raw_val;
-        else if (DCR_rs1_sel == WB_raw_sel)     RAW_rs1_val = WB_raw_val;
-        else                                    RAW_rs1_val = RGF_rs1_val;
+        if (DCR_rs1_sel == EX_raw_sel && !EX_stall && DCR_rs1_sel != 0 && EX_raw_sel != 0) begin
+            RAW_rs1_val <= EX_raw_val;
+            stall <= 0;
+        end
+                    
+        else if (DCR_rs1_sel == MEM_raw_sel && !MEM_stall && DCR_rs1_sel != 0 && MEM_raw_sel != 0) begin
+            RAW_rs1_val <= 32'd777;
+            stall <= 1;
+        end            
+
+        else begin
+            RAW_rs1_val <= RGF_rs1_val;
+            stall <= 0;
+        end
         
-        if      (DCR_rs2_sel == EX_raw_sel)     RAW_rs2_val = EX_raw_val;
-        else if (DCR_rs2_sel == MEM_raw_sel)    RAW_rs2_val = MEM_raw_val; 
-        else if (DCR_rs2_sel == WB_raw_sel)     RAW_rs2_val = WB_raw_val;
-        else                                    RAW_rs2_val = RGF_rs2_val;
+        if (DCR_rs2_sel == EX_raw_sel && !EX_stall && DCR_rs2_sel != 0 && EX_raw_sel != 0) begin
+            RAW_rs2_val <= EX_raw_val;
+            stall <= 0;
+        end
+                    
+        else if (DCR_rs2_sel == MEM_raw_sel && !MEM_stall && DCR_rs2_sel != 0 && MEM_raw_sel != 0) begin
+            RAW_rs2_val <= 32'd777;      
+            stall <= 1; 
+        end            
+        
+        else begin
+            RAW_rs2_val <= RGF_rs2_val;
+            stall <= 0;
+        end            
 
     end
 
